@@ -30,7 +30,7 @@ A notification will appear under the admin user account indicating *”CG-PWS pl
 ```
 cd /usr/local/hestia/plugins/cg-pws
 ./install
-touch “/usr/local/hestia/data/hcpp/installed/cg-pws”
+touch "/usr/local/hestia/data/hcpp/installed/cg-pws"
 ```
 
 &nbsp;
