@@ -2,3 +2,4 @@
 
 # Notify installation has finished
 /usr/local/hestia/bin/v-add-user-notification admin CG-PWS "<span>&#127811;</span> CG-PWS plugin has finished installing."
+
