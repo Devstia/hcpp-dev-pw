@@ -57,12 +57,24 @@ if ( ! class_exists( 'CG_PWS') ) {
             $template .= "keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment\n";
             $template .= "subjectAltName = @alt_names\n";
             $template .= "\n";
+            $template .= "[req]\n";
+            $template .= "distinguished_name=req_distinguished_name\n";
+            $template .= "\n";
             $template .= "[alt_names]\n";
             $n = 1;
             foreach ( $domains as $domain ) {
                 $template .= "DNS." . $n . " = " . $domain . "\n";
                 $n++;
             }
+            $template .= "\n";
+            $template .= "[req_distinguished_name]\n";
+            $template .= "countryName = US\n";
+            $template .= "stateOrProvinceName = California\n";
+            $template .= "localityName = San Diego\n";
+            $template .= "organizationName = Code Garden\n";
+            $template .= "organizationalUnitName = IT Department\n";
+            $template .= "commonName = $domains[0]\n";
+            $template .= "\n";
             $template = $hcpp->do_action( 'cg_pws_generate_website_cert_template', $template );
             file_put_contents( '/tmp/template.cnf', $template );
 
