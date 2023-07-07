@@ -45,6 +45,11 @@ if ( ! class_exists( 'CG_PWS') ) {
          * @param array $domains The domains to generate the certificate for.
          */
         public function generate_website_cert( $user, $domains ) {
+            global $hcpp;
+            if ( ! is_dir( '/home/' . $user . '/conf/web/' . $domains[0] ) ) {
+                $hcpp->log( 'Error - user ' . $user . ' or website ' . $domains[0] . ' does not exist, skipping certificate generation.');
+                return;
+            }
 
             // Write the /tmp/template.cnf file
             $template = "authorityKeyIdentifier=keyid,issuer\n";
@@ -58,11 +63,13 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $template .= "DNS." . $n . " = " . $domain . "\n";
                 $n++;
             }
-            global $hcpp;
             $template = $hcpp->do_action( 'cg_pws_generate_website_cert_template', $template );
             file_put_contents( '/tmp/template.cnf', $template );
 
             // Generate the certificate
+            if ( ! is_dir( '/home/' . $user . '/conf/web/' . $domains[0] . '/ssl' ) ) {
+                mkdir( '/home/' . $user . '/conf/web/' . $domains[0] . '/ssl', 0755, true );
+            }
             $cmd = 'cd /home/' . $user . '/conf/web/' . $domains[0] . '/ssl && ';
             $cmd .= 'openssl genrsa -out ./' . $domains[0] . '.key 2048 && ';
             $cmd .= 'openssl req -new -key ./' . $domains[0] . '.key -out ./' . $domains[0] . '.csr -subj "/CN=' . $domains[0] . '" -config /tmp/template.cnf && ';
