@@ -23,7 +23,8 @@ if ( ! class_exists( 'CG_PWS') ) {
 
         /**
          * Generate the master certificate for PWS, this will overwrite
-         * any existing certificate if one already exists.
+         * any existing certificate if one already exists; then add it
+         * to the system trusted certificates.
          */
         public function generate_master_cert() {
             $path = '/media/appFolder';
@@ -31,7 +32,12 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd .= 'rm -f ./pws.key 2>/dev/null && ';
             $cmd .= 'openssl  genrsa -out ./pws.key 2048 2>&1 && ';
             $cmd .= 'rm -f ./pws.crt 2>/dev/null && ';
-            $cmd .= 'openssl req -x509 -new -nodes -key ./pws.key -sha256 -days 825 -out ./pws.crt -subj "/C=US/ST=California/L=San Diego/O=CodeGarden PWS/OU=Customers/CN=dev.cc" 2>&1';
+            $cmd .= 'openssl req -x509 -new -nodes -key ./pws.key -sha256 -days 825 -out ./pws.crt -subj "/C=US/ST=California/L=San Diego/O=CodeGarden PWS/OU=Customers/CN=dev.cc" 2>&1 && ';
+            $cmd .= 'rm -f /usr/local/share/ca-certificates/pws && ';
+            $cmd .= 'mkdir -p /usr/local/share/ca-certificates/pws && ';
+            $cmd .= 'cp ./pws.crt /usr/local/share/ca-certificates/pws/pws.crt && ';
+            $cmd .= 'cp ./pws.key /usr/local/share/ca-certificates/pws/pws.key && ';
+            $cmd .= 'update-ca-certificates 2>&1';
             global $hcpp;
             $cmd = $hcpp->do_action( 'cg_pws_generate_master_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
@@ -88,7 +94,9 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd .= 'openssl x509 -req -in ./' . $domains[0] . '.csr -CA /media/appFolder/pws.crt -CAkey /media/appFolder/pws.key -CAcreateserial -out ./' . $domains[0] . '.crt -days 825 -sha256 -extfile /tmp/template.cnf && ';
             $cmd .= 'cat ./' . $domains[0] . '.key ./' . $domains[0] . '.crt > ./' . $domains[0] . '.pem && ';
             $cmd .= 'chmod -R 640 ./ && ';
-            $cmd .= 'rm -f /tmp/template.cnf';
+            $cmd .= 'rm -f /tmp/template.cnf && ';
+            $cmd .= 'v-delete-web-domain-ssl ' . $user . ' ' . $domains[0] . ' ; ';
+            $cmd .= 'v-add-web-domain-ssl ' . $user . ' ' . $domains[0] . ' /home/' . $user . '/conf/web/' . $domains[0] . '/cg_pws_ssl';
             $cmd = $hcpp->do_action( 'cg_pws_generate_website_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
         }
