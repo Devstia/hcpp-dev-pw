@@ -28,7 +28,7 @@ if ( ! class_exists( 'CG_PWS') ) {
          */
         public function csrf_verified() {
             global $hcpp;
-            if ( $_SERVER['PHP_SELF'] != '/web/index.php' ) return;
+            if ( $_SERVER['PHP_SELF'] != '/edit/web/index.php' ) return;
             if ( ! isset( $_REQUEST['v_ftp_pre_path'] ) ) return;
             $user = $hcpp->delLeftMost( $_REQUEST['v_ftp_pre_path'], '/' );
             $user = $hcpp->getLeftMost( $user, '/' );
