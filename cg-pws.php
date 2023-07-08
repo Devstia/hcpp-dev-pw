@@ -28,13 +28,14 @@ if ( ! class_exists( 'CG_PWS') ) {
          */
         public function csrf_verified() {
             global $hcpp;
-            $hcpp->log( $_REQUEST );
-            // if ( isset( $_POST['action'] ) && $_POST['action'] == 'edit_web_domain' ) {
-            //     $user = $_POST['user'];
-            //     $domain = $_POST['domain'];
-            //     $domains = [ $domain ];
-            //     $this->generate_website_cert( $user, $domains );
-            // }
+            if ( $_SERVER['PHP_SELF'] != '/web/index.php' ) return;
+            if ( ! isset( $_REQUEST['v_ftp_pre_path'] ) ) return;
+            $user = $hcpp->delLeftMost( $_REQUEST['v_ftp_pre_path'], '/' );
+            $user = $hcpp->getLeftMost( $user, '/' );
+            $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
+            $domains = array_map( 'trim', $lines );
+            array_unshift($domains, $_REQUEST['v_domain'] );
+            $this->generate_website_cert( $user, $domains );
         }
 
         /**
