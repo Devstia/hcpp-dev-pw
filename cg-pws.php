@@ -20,6 +20,21 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->collabora = $this;
             $hcpp->add_action( 'invoke_plugin', [ $this, 'invoke_plugin' ] );
             $hcpp->add_action( 'new_web_domain_ready', [ $this, 'new_web_domain_ready' ] );
+            $hcpp->add_action( 'csrf_verified', [ $this, 'csrf_verified' ] );
+        }
+
+        /**
+         * Capture edit web form submission, and generate a new certificate
+         */
+        public function csrf_verified() {
+            global $hcpp;
+            $hcpp->log( $_REQUEST );
+            // if ( isset( $_POST['action'] ) && $_POST['action'] == 'edit_web_domain' ) {
+            //     $user = $_POST['user'];
+            //     $domain = $_POST['domain'];
+            //     $domains = [ $domain ];
+            //     $this->generate_website_cert( $user, $domains );
+            // }
         }
 
         /**
@@ -109,6 +124,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $user = $args[0];
             $domain = $args[1];
             $this->generate_website_cert( $user, array( $domain ) );
+            return $args;
         }
 
         // Generate certs on demand
