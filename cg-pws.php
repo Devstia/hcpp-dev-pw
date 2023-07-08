@@ -76,11 +76,11 @@ if ( ! class_exists( 'CG_PWS') ) {
                 return;
             }
 
-            // Generate the certificate
+            // Generate the certificate data in a fresh cg_pws_ssl
             $cg_pws_ssl = '/home/' . $user . '/conf/web/' . $domains[0] . '/cg_pws_ssl';
-            if ( ! is_dir( $cg_pws_ssl ) ) {
-                mkdir( $cg_pws_ssl, 0755, true );
-            }
+            $cmd = 'rm -rf ' . $cg_pws_ssl . ' && ';
+            $cmd .= 'mkdir -p ' . $cg_pws_ssl;
+            shell_exec( $cmd );
 
             // Write the template.cnf file
             $template = "authorityKeyIdentifier=keyid,issuer\n";
