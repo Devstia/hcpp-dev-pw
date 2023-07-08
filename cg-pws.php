@@ -111,7 +111,7 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             $cmd = 'cd ' . $cg_pws_ssl . ' && ';
             $cmd .= 'openssl genrsa -out ./' . $domains[0] . '.key 2048 && ';
-            $cmd .= 'openssl req -new -key ./' . $domains[0] . '.key -out ./' . $domains[0] . '.csr -subj "/CN=' . "'" . $domains[0] . "'" . '" -config ./template.cnf && ';
+            $cmd .= 'openssl req -new -key ./' . $domains[0] . '.key -out ./' . $domains[0] . '.csr -subj "' . "'" . '/CN=' . $domains[0] . "'" . '" -config ./template.cnf && ';
             $cmd .= 'openssl x509 -req -in ./' . $domains[0] . '.csr -CA /media/appFolder/pws.crt -CAkey /media/appFolder/pws.key -CAcreateserial -out ./' . $domains[0] . '.crt -days 825 -sha256 -extfile ./template.cnf && ';
             $cmd .= 'cat ./' . $domains[0] . '.key ./' . $domains[0] . '.crt > ./' . $domains[0] . '.pem && ';
             $cmd .= 'chmod -R 640 ./ && ';
