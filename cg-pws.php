@@ -115,11 +115,12 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd .= 'openssl x509 -req -in ./' . $domains[0] . '.csr -CA /media/appFolder/pws.crt -CAkey /media/appFolder/pws.key -CAcreateserial -out ./' . $domains[0] . '.crt -days 825 -sha256 -extfile ./template.cnf && ';
             $cmd .= 'cat ./' . $domains[0] . '.key ./' . $domains[0] . '.crt > ./' . $domains[0] . '.pem && ';
             $cmd .= 'chmod -R 640 ./ && ';
-            $cmd .= 'v-delete-web-domain-ssl ' . $user . ' ' . $domains[0] . ' ; ';
-            $cmd .= 'v-add-web-domain-ssl ' . $user . ' ' . $domains[0] . ' /home/' . $user . '/conf/web/' . $domains[0] . '/cg_pws_ssl';
+            $cmd .= '/usr/local/hestia/bin/v-delete-web-domain-ssl ' . $user . ' ' . $domains[0] . ' ; ';
+            $cmd .= '/usr/local/hestia/bin/v-add-web-domain-ssl ' . $user . ' ' . $domains[0] . ' /home/' . $user . '/conf/web/' . $domains[0] . '/cg_pws_ssl';
             $cmd = $hcpp->do_action( 'cg_pws_generate_website_cert', $cmd );
-            file_put_contents( '/tmp/cg_pws_generate_website_cert.sh', $cmd );
-            $hcpp->log( shell_exec( 'bash -c "source /tmp/cg_pws_generate_website_cert.sh"' ) );
+            $hcpp->log( shell_exec( $cmd ) );
+            //file_put_contents( '/tmp/cg_pws_generate_website_cert.sh', $cmd );
+            //$hcpp->log( shell_exec( 'bash -c "source /tmp/cg_pws_generate_website_cert.sh"' ) );
             // unlink( '/tmp/cg_pws_generate_website_cert.sh' );
         }
 
