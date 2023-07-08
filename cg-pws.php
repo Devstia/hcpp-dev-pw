@@ -119,9 +119,6 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd .= '/usr/local/hestia/bin/v-add-web-domain-ssl ' . $user . ' ' . $domains[0] . ' /home/' . $user . '/conf/web/' . $domains[0] . '/cg_pws_ssl';
             $cmd = $hcpp->do_action( 'cg_pws_generate_website_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
-            //file_put_contents( '/tmp/cg_pws_generate_website_cert.sh', $cmd );
-            //$hcpp->log( shell_exec( 'bash -c "source /tmp/cg_pws_generate_website_cert.sh"' ) );
-            // unlink( '/tmp/cg_pws_generate_website_cert.sh' );
         }
 
         /**
