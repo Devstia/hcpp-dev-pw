@@ -35,9 +35,9 @@ if ( ! class_exists( 'CG_PWS') ) {
             $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
             $domains = array_map( 'trim', $lines );
             array_unshift($domains, $_REQUEST['v_domain'] );
-
-            // TODO: Use invoke plugin to generate the certificate
-            // $this->generate_website_cert( $user, $domains );
+            $args = [ 'generate_website_cert', $user ];
+            $args = array_merge( $args, $domains );
+            $hcpp->log( $hcpp->run( 'invoke-plugin ' . implode( ' ', $args ) ) );
         }
 
         /**
@@ -105,12 +105,8 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // Generate the certificate
             $cg_pws_ssl = '/home/' . $user . '/conf/web/' . $domains[0] . '/cg_pws_ssl';
-            $hcpp->log( $cg_pws_ssl );
             if ( ! is_dir( $cg_pws_ssl ) ) {
-                $hcpp->log( 'Creating directory ' . $cg_pws_ssl );
                 mkdir( $cg_pws_ssl, 0755, true );
-            }else{
-                $hcpp->log( 'Directory exists ' . $cg_pws_ssl );
             }
             $cmd = 'cd ' . $cg_pws_ssl . ' && ';
             $cmd .= 'openssl genrsa -out ./' . $domains[0] . '.key 2048 && ';
