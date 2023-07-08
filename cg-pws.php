@@ -19,6 +19,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             global $hcpp;
             $hcpp->collabora = $this;
             $hcpp->add_action( 'invoke_plugin', [ $this, 'invoke_plugin' ] );
+            $hcpp->add_action( 'new_web_domain_ready', [ $this, 'new_web_domain_ready' ] );
         }
 
         /**
@@ -99,6 +100,15 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd .= 'v-add-web-domain-ssl ' . $user . ' ' . $domains[0] . ' /home/' . $user . '/conf/web/' . $domains[0] . '/cg_pws_ssl';
             $cmd = $hcpp->do_action( 'cg_pws_generate_website_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
+        }
+
+        /**
+         * Generate a certificate for the website domain.
+         */
+        public function new_web_domain_ready( $args ) {
+            $user = $args[0];
+            $domain = $args[1];
+            $this->generate_website_cert( $user, array( $domain ) );
         }
 
         // Generate certs on demand
