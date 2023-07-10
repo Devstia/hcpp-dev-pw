@@ -21,6 +21,64 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'invoke_plugin', [ $this, 'invoke_plugin' ] );
             $hcpp->add_action( 'new_web_domain_ready', [ $this, 'new_web_domain_ready' ] );
             $hcpp->add_action( 'csrf_verified', [ $this, 'csrf_verified' ] );
+            $hcpp->add_action( 'render_page', [ $this, 'render_page' ] );
+        }
+
+        // Generate certs on demand
+        public function invoke_plugin( $args ) {
+            if ( $args[0] == 'generate_master_cert' ) {
+                $this->generate_master_cert();
+            }
+            if ( $args[0] == 'generate_website_cert') {
+                $user = $args[1];
+                $domains = array();
+                for ($i = 2; $i < count($args); $i++) {
+                    $domains[] = $args[$i];
+                }
+                $this->generate_website_cert( $user, $domains );
+            }          
+            return $args;
+        }
+
+        /**
+         * Intercept web edit save, ensure ssl crt/key are not empty; suppresing
+         * the empty error message as we'll generate a certificate on the fly.
+         */
+        public function render_page( $args ) {
+            if ( $args['page'] == 'edit_web' ) {
+                global $hcpp;
+                $code = '<script>
+                // Get references to the necessary elements
+                const sslCheckbox = document.getElementById("v_ssl");
+                const sslCrtTextarea = document.getElementById("ssl_crt");
+                const sslKeyTextarea = document.getElementById("v_ssl_key");
+                const form = document.getElementById("vstobjects");
+                const saveButton = form.querySelector("button[type="submit"]");
+
+                // Add an event listener to the form submit event
+                form.addEventListener("submit", function(event) {
+                    // Check if the SSL checkbox is checked
+                    if (sslCheckbox.checked) {
+                        if (sslCrtTextarea.value.trim() == "") {
+                            sslCrtTextarea.value = "     ";
+                        }
+                        if (sslKeyTextarea.value.trim() == "") {
+                            sslKeyTextarea.value = "     ";
+                        }
+                    }
+                    return true;
+                });</script>
+                <style>
+                    /* Hide native generate csr link */
+                    span #generate-csr {
+                        display: none;
+                    }
+                </style>';
+                $content = $args['content'];
+                $content = str_replace( '</form>', '</form>' . $code, $content );
+                $args['content'] = $content;
+            }
+            return $args;
         }
 
         /**
@@ -142,22 +200,6 @@ if ( ! class_exists( 'CG_PWS') ) {
             $user = $args[0];
             $domain = $args[1];
             $this->generate_website_cert( $user, array( $domain ) );
-            return $args;
-        }
-
-        // Generate certs on demand
-        public function invoke_plugin( $args ) {
-            if ( $args[0] == 'generate_master_cert' ) {
-                $this->generate_master_cert();
-            }
-            if ( $args[0] == 'generate_website_cert') {
-                $user = $args[1];
-                $domains = array();
-                for ($i = 2; $i < count($args); $i++) {
-                    $domains[] = $args[$i];
-                }
-                $this->generate_website_cert( $user, $domains );
-            }          
             return $args;
         }
     }
