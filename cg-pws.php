@@ -22,6 +22,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'new_web_domain_ready', [ $this, 'new_web_domain_ready' ] );
             $hcpp->add_action( 'csrf_verified', [ $this, 'csrf_verified' ] );
             $hcpp->add_action( 'render_page', [ $this, 'render_page' ] );
+            $hcpp->add_action( 'nodeapp_resurrect_apps', [ $this, 'nodeapp_resurrect_apps' ] );
         }
 
         // Generate certs on demand
@@ -209,6 +210,16 @@ if ( ! class_exists( 'CG_PWS') ) {
             $domain = $args[1];
             $this->generate_website_cert( $user, array( $domain ) );
             return $args;
+        }
+
+        /**
+         * Ensure that the master certificate is generated upon boot.
+         */
+        public function nodeapp_resurrect_apps( $cmd ) {
+            if ( ! file_exists( '/media/appFolder/pws.crt') || ! file_exists( '/media/appFolder/pws.key' ) ) {
+                $this->generate_master_cert();
+            }
+            return $cmd;
         }
     }
     new CG_PWS(); 
