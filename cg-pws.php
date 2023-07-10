@@ -31,7 +31,17 @@ if ( ! class_exists( 'CG_PWS') ) {
             global $hcpp;
             if ( $_SERVER['PHP_SELF'] != '/edit/web/index.php' ) return;
             if ( ! isset( $_REQUEST['v_ftp_pre_path'] ) ) return;
+            $generate = false;
             if ( $_REQUEST['v_ssl'] == 'on' && trim( $_REQUEST['v_ssl_crt'] ) == '' && trim( $_REQUEST['v_ssl_key'] ) == '' ) {
+                // Generate a new certificate on ssl option with no crt/key
+                $generate = true;
+            }
+            // if (true) {
+            //     // Generate a new certificate on ssl option and aliases changed
+            //     $generate = true;
+            // }
+            if ( $generate ) {
+                $_REQUEST['v_ssl'] == '';
                 $user = $hcpp->delLeftMost( $_REQUEST['v_ftp_pre_path'], '/home/' );
                 $user = $hcpp->getLeftMost( $user, '/' );
                 $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
