@@ -42,7 +42,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             //     $generate = true;
             // }
             if ( $generate ) {
-                $_REQUEST['v_ssl'] == '';
+                unset($_REQUEST['v_ssl']);
                 $user = $hcpp->delLeftMost( $_REQUEST['v_ftp_pre_path'], '/home/' );
                 $user = $hcpp->getLeftMost( $user, '/' );
                 $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
