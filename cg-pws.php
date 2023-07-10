@@ -58,11 +58,12 @@ if ( ! class_exists( 'CG_PWS') ) {
                 form.addEventListener("submit", function(event) {
                     // Check if the SSL checkbox is checked
                     if (sslCheckbox.checked) {
-                        alert("Clearing SSL crt/key");
                         if (sslCrtTextarea.value.trim() == "") {
+                            alert("Clearing SSL crt");
                             sslCrtTextarea.value = "     ";
                         }
                         if (sslKeyTextarea.value.trim() == "") {
+                            alert("Clearing SSL key");
                             sslKeyTextarea.value = "     ";
                         }
                     }
