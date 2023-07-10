@@ -46,14 +46,13 @@ if ( ! class_exists( 'CG_PWS') ) {
          */
         public function render_page( $args ) {
             if ( $args['page'] == 'edit_web' ) {
-                global $hcpp;
                 $code = '<script>
                 // Get references to the necessary elements
                 const sslCheckbox = document.getElementById("v_ssl");
                 const sslCrtTextarea = document.getElementById("ssl_crt");
                 const sslKeyTextarea = document.getElementById("v_ssl_key");
                 const form = document.getElementById("vstobjects");
-                const saveButton = form.querySelector("button[type="submit"]");
+                const saveButton = form.querySelector("button[type=\"submit\"]");
 
                 // Add an event listener to the form submit event
                 form.addEventListener("submit", function(event) {
