@@ -98,28 +98,16 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // Generate a new certificate on ssl option and alias added
             if ( $_REQUEST['v_ssl'] == 'on' ) {
-                $request_aliases = explode( "\r\n", $_REQUEST['v_aliases'] );
-                $hcpp->log( $request_aliases );
-                $existing_aliases = $hcpp->run( 'list-web-domain ' . $user . ' ' . $domain . ' json');
-                $hcpp->log( $existing_aliases ); 
-                // $hcpp->log( 'v_ssl is on');
-                // $path = '/home/' . $user . '/conf/web/' . $domain . '/cg_pws_ssl/template.cnf';
-                // $hcpp->log( 'Checking for ' . $path);
-                // if ( file_exists( $path ) ) {
-                //     $hcpp->log( 'Found template.cnf and checking aliases');
-                //     $template = file_get_contents( $path );
-                //     $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
-                //     foreach ( $lines as $line ) {
-                //         $line = trim( $line );
-                //         if ( $line != '' ) {
-                //             $hcpp->log( 'Checking ' . $template . ' for ' . $line  );
-                //             if ( strpos( $template, $line ) == false ) {
-                //                 $generate = true;
-                //                 break;    
-                //             }
-                //         }
-                //     }
-                // }
+                $aliases = explode( "\r\n", $_REQUEST['v_aliases'] );
+                $existing = $hcpp->run( 'list-web-domain ' . $user . ' ' . $domain . ' json');
+                $existing = $existing['ALIAS'];              
+                foreach ( $aliases as $alias ) {
+                    if ( strpos( $existing . ',', $alias . ',' ) == false ) {
+                        $hcpp->log( 'Alias ' . $alias . ' not found in ' . $existing . ', generating new certificate');
+                        $generate = true;
+                        break;    
+                    }
+                }
             }
 
             // Generate the new certificate
