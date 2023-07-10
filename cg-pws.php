@@ -101,7 +101,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $existing = $hcpp->run( 'list-web-domain ' . $user . ' ' . $domain . ' json');
                 $existing = $existing[$domain]['ALIAS'];
                 foreach ( $aliases as $alias ) {
-                    if ( strpos( $existing . ',', $alias . ',' ) == false ) {
+                    if ( strpos( $existing . ',', $alias . ',' ) === false ) {
                         $hcpp->log( 'Alias ' . $alias . ' not found in ' . $existing . ', generating new certificate');
                         $generate = true;
                         break;    
