@@ -53,17 +53,12 @@ if ( ! class_exists( 'CG_PWS') ) {
                 const sslKeyTextarea = document.getElementById("v_ssl_key");
                 const form = document.getElementById("vstobjects");
                 const saveButton = form.querySelector("button[type=\"submit\"]");
-
-                // Add an event listener to the form submit event
                 form.addEventListener("submit", function(event) {
-                    // Check if the SSL checkbox is checked
                     if (sslCheckbox.checked) {
                         if (sslCrtTextarea.value.trim() == "") {
-                            alert("Clearing SSL crt");
                             sslCrtTextarea.value = "     ";
                         }
                         if (sslKeyTextarea.value.trim() == "") {
-                            alert("Clearing SSL key");
                             sslKeyTextarea.value = "     ";
                         }
                     }
@@ -95,7 +90,6 @@ if ( ! class_exists( 'CG_PWS') ) {
             
             // Generate a new certificate on ssl option with no existing crt/key
             if ( $_REQUEST['v_ssl'] == 'on' && trim( $_REQUEST['v_ssl_crt'] ) == '' && trim( $_REQUEST['v_ssl_key'] ) == '' ) {
-
                 $generate = true;
             }
             $user = $hcpp->delLeftMost( $_REQUEST['v_ftp_pre_path'], '/home/' );
@@ -106,11 +100,13 @@ if ( ! class_exists( 'CG_PWS') ) {
             if ( $_REQUEST['v_ssl'] == 'on' ) {
                 $path = '/usr/' . $user . '/conf/web/' . $domain . '/cg_pws_ssl/template.cnf';
                 if ( file_exists( $path ) ) {
+                    $hcpp->log( 'Found template.cnf and checking aliases');
                     $template = file_get_contents( $path );
                     $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
                     foreach ( $lines as $line ) {
                         $line = trim( $line );
                         if ( $line != '' ) {
+                            $hcpp->log( 'Checking ' . $template . ' for ' . $line  );
                             if ( strpos( $template, $line ) == false ) {
                                 $generate = true;
                                 break;    
