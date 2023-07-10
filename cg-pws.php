@@ -69,7 +69,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 });</script>
                 <style>
                     /* Hide native generate csr link */
-                    span #generate-csr {
+                    #generate-csr {
                         display: none;
                     }
                 </style>';
