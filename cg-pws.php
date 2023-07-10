@@ -85,7 +85,6 @@ if ( ! class_exists( 'CG_PWS') ) {
             global $hcpp;
             if ( $_SERVER['PHP_SELF'] != '/edit/web/index.php' ) return;
             if ( ! isset( $_REQUEST['v_ftp_pre_path'] ) ) return;
-            $hcpp->log( $_REQUEST );
             $generate = false;
             
             // Generate a new certificate on ssl option with no existing crt/key
@@ -100,9 +99,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             if ( $_REQUEST['v_ssl'] == 'on' ) {
                 $aliases = explode( "\r\n", $_REQUEST['v_aliases'] );
                 $existing = $hcpp->run( 'list-web-domain ' . $user . ' ' . $domain . ' json');
-                $hcpp->log( $existing );
-                $hcpp->log( "Existing aliases: " . $existing['ALIAS']);
-                $existing = $existing['ALIAS'];
+                $existing = $existing[$domain]['ALIAS'];
                 foreach ( $aliases as $alias ) {
                     if ( strpos( $existing . ',', $alias . ',' ) == false ) {
                         $hcpp->log( 'Alias ' . $alias . ' not found in ' . $existing . ', generating new certificate');
