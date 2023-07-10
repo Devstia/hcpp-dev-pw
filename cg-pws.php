@@ -100,7 +100,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             if ( $_REQUEST['v_ssl'] == 'on' ) {
                 $request_aliases = explode( "\r\n", $_REQUEST['v_aliases'] );
                 $hcpp->log( $request_aliases );
-                $existing_aliases = $hcpp->run( 'list_web_domain ' . $user . ' ' . $domain . ' json');
+                $existing_aliases = $hcpp->run( 'list-web-domain ' . $user . ' ' . $domain . ' json');
                 $hcpp->log( $existing_aliases ); 
                 // $hcpp->log( 'v_ssl is on');
                 // $path = '/home/' . $user . '/conf/web/' . $domain . '/cg_pws_ssl/template.cnf';
