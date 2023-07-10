@@ -99,7 +99,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             // Generate a new certificate on ssl option and alias added
             if ( $_REQUEST['v_ssl'] == 'on' ) {
                 $hcpp->log( 'v_ssl is on');
-                $path = '/usr/' . $user . '/conf/web/' . $domain . '/cg_pws_ssl/template.cnf';
+                $path = '/home/' . $user . '/conf/web/' . $domain . '/cg_pws_ssl/template.cnf';
                 $hcpp->log( 'Checking for ' . $path);
                 if ( file_exists( $path ) ) {
                     $hcpp->log( 'Found template.cnf and checking aliases');
