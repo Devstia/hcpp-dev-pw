@@ -30,6 +30,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             global $hcpp;
             if ( $_SERVER['PHP_SELF'] != '/edit/web/index.php' ) return;
             if ( ! isset( $_REQUEST['v_ftp_pre_path'] ) ) return;
+            $hcpp->log( $_REQUEST );
             $user = $hcpp->delLeftMost( $_REQUEST['v_ftp_pre_path'], '/home/' );
             $user = $hcpp->getLeftMost( $user, '/' );
             $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
