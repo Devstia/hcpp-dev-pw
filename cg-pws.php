@@ -90,18 +90,37 @@ if ( ! class_exists( 'CG_PWS') ) {
             if ( ! isset( $_REQUEST['v_ftp_pre_path'] ) ) return;
             $hcpp->log( $_REQUEST );
             $generate = false;
+            
+            // Generate a new certificate on ssl option with no existing crt/key
             if ( $_REQUEST['v_ssl'] == 'on' && trim( $_REQUEST['v_ssl_crt'] ) == '' && trim( $_REQUEST['v_ssl_key'] ) == '' ) {
-                // Generate a new certificate on ssl option with no crt/key
+
                 $generate = true;
             }
-            // if (true) {
-            //     // Generate a new certificate on ssl option and aliases changed
-            //     $generate = true;
-            // }
+            $user = $hcpp->delLeftMost( $_REQUEST['v_ftp_pre_path'], '/home/' );
+            $user = $hcpp->getLeftMost( $user, '/' );
+            $domain = $_REQUEST['v_domain'];
+
+            // Generate a new certificate on ssl option and alias added
+            if ( $_REQUEST['v_ssl'] == 'on' ) {
+                $path = '/usr/' . $user . '/conf/web/' . $domain . '/cg_pws_ssl/template.cnf';
+                if ( file_exists( $path ) ) {
+                    $template = file_get_contents( $path );
+                    $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
+                    foreach ( $lines as $line ) {
+                        $line = trim( $line );
+                        if ( $line != '' ) {
+                            if ( strpos( $template, $line ) == false ) {
+                                $generate = true;
+                                break;    
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Generate the new certificate
             if ( $generate ) {
                 unset($_REQUEST['v_ssl']);
-                $user = $hcpp->delLeftMost( $_REQUEST['v_ftp_pre_path'], '/home/' );
-                $user = $hcpp->getLeftMost( $user, '/' );
                 $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
                 $domains = array_map( 'trim', $lines );
                 array_unshift($domains, $_REQUEST['v_domain'] );
