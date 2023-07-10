@@ -100,7 +100,8 @@ if ( ! class_exists( 'CG_PWS') ) {
             if ( $_REQUEST['v_ssl'] == 'on' ) {
                 $aliases = explode( "\r\n", $_REQUEST['v_aliases'] );
                 $existing = $hcpp->run( 'list-web-domain ' . $user . ' ' . $domain . ' json');
-                $existing = $existing['ALIAS'];              
+                $hcpp->log( "Existing aliases: " . $existing['ALIAS']);
+                $existing = $existing['ALIAS'];
                 foreach ( $aliases as $alias ) {
                     if ( strpos( $existing . ',', $alias . ',' ) == false ) {
                         $hcpp->log( 'Alias ' . $alias . ' not found in ' . $existing . ', generating new certificate');
