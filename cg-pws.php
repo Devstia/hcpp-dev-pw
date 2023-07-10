@@ -25,20 +25,22 @@ if ( ! class_exists( 'CG_PWS') ) {
 
         /**
          * Capture edit web form submission, and generate a new certificate
+         * if ssl option is checked and crt/key are empty.
          */
         public function csrf_verified() {
             global $hcpp;
             if ( $_SERVER['PHP_SELF'] != '/edit/web/index.php' ) return;
             if ( ! isset( $_REQUEST['v_ftp_pre_path'] ) ) return;
-            $hcpp->log( $_REQUEST );
-            $user = $hcpp->delLeftMost( $_REQUEST['v_ftp_pre_path'], '/home/' );
-            $user = $hcpp->getLeftMost( $user, '/' );
-            $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
-            $domains = array_map( 'trim', $lines );
-            array_unshift($domains, $_REQUEST['v_domain'] );
-            $args = [ 'generate_website_cert', $user ];
-            $args = array_merge( $args, $domains );
-            $hcpp->log( $hcpp->run( 'invoke-plugin ' . implode( ' ', $args ) ) );
+            if ( $_REQUEST['v_ssl'] == 'on' && trim( $_REQUEST['v_ssl_crt'] ) == '' && trim( $_REQUEST['v_ssl_key'] ) == '' ) {
+                $user = $hcpp->delLeftMost( $_REQUEST['v_ftp_pre_path'], '/home/' );
+                $user = $hcpp->getLeftMost( $user, '/' );
+                $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
+                $domains = array_map( 'trim', $lines );
+                array_unshift($domains, $_REQUEST['v_domain'] );
+                $args = [ 'generate_website_cert', $user ];
+                $args = array_merge( $args, $domains );
+                $hcpp->log( $hcpp->run( 'invoke-plugin ' . implode( ' ', $args ) ) );    
+            }
         }
 
         /**
