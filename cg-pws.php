@@ -80,7 +80,10 @@ if ( ! class_exists( 'CG_PWS') ) {
                     $domains[] = $args[$i];
                 }
                 $this->generate_website_cert( $user, $domains );
-            }          
+            }
+            if ( $args[0] == 'regenerate_certificates' ) {
+                $this->regenerate_certificates();
+            }
             return $args;
         }
 
@@ -184,6 +187,28 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $this->generate_master_cert();
             }
             return $cmd;
+        }
+
+        /**
+         * Regenerate the master and all website certificates.
+         */ 
+        public function regenerate_certificates() {
+            global $hcpp;
+            $hcpp->log( 'Regenerating certificates...' );
+            
+            // Gather list of existing certificates that are based on cg_pws_ssl
+            $path = '/home/pws/conf/web';
+            $domains = [];
+            $directory = new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS);
+            $iterator = new RecursiveIteratorIterator($directory, RecursiveIteratorIterator::SELF_FIRST);
+            foreach ($iterator as $file) {
+                if ($file->isDir()) {
+                    $domain = $file->getFilename();
+                    echo $file . "\n";
+                    echo $domain . "\n";
+                    $domains[] = $domain;
+                }
+            }
         }
 
         /**
