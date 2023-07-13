@@ -25,59 +25,6 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'nodeapp_resurrect_apps', [ $this, 'nodeapp_resurrect_apps' ] );
         }
 
-        // Generate certs on demand
-        public function invoke_plugin( $args ) {
-            if ( $args[0] == 'generate_master_cert' ) {
-                $this->generate_master_cert();
-            }
-            if ( $args[0] == 'generate_website_cert') {
-                $user = $args[1];
-                $domains = array();
-                for ($i = 2; $i < count($args); $i++) {
-                    $domains[] = $args[$i];
-                }
-                $this->generate_website_cert( $user, $domains );
-            }          
-            return $args;
-        }
-
-        /**
-         * Intercept web edit save, ensure ssl crt/key are not empty; suppresing
-         * the empty error message as we'll generate a certificate on the fly.
-         */
-        public function render_page( $args ) {
-            if ( $args['page'] == 'edit_web' ) {
-                $code = '<script>
-                // Get references to the necessary elements
-                const sslCheckbox = document.getElementById("v_ssl");
-                const sslCrtTextarea = document.getElementById("ssl_crt");
-                const sslKeyTextarea = document.getElementById("v_ssl_key");
-                const form = document.getElementById("vstobjects");
-                const saveButton = form.querySelector("button[type=\"submit\"]");
-                form.addEventListener("submit", function(event) {
-                    if (sslCheckbox.checked) {
-                        if (sslCrtTextarea.value.trim() == "") {
-                            sslCrtTextarea.value = "     ";
-                        }
-                        if (sslKeyTextarea.value.trim() == "") {
-                            sslKeyTextarea.value = "     ";
-                        }
-                    }
-                    return true;
-                });</script>
-                <style>
-                    /* Hide native generate csr link */
-                    #generate-csr {
-                        display: none;
-                    }
-                </style>';
-                $content = $args['content'];
-                $content = str_replace( '</form>', '</form>' . $code, $content );
-                $args['content'] = $content;
-            }
-            return $args;
-        }
-
         /**
          * Capture edit web form submission, and generate a new certificate
          * if ssl option is checked and crt/key are empty.
@@ -119,6 +66,22 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $args = array_merge( $args, $domains );
                 $hcpp->log( $hcpp->run( 'invoke-plugin ' . implode( ' ', $args ) ) );    
             }
+        }
+
+        // Generate certs on demand
+        public function invoke_plugin( $args ) {
+            if ( $args[0] == 'generate_master_cert' ) {
+                $this->generate_master_cert();
+            }
+            if ( $args[0] == 'generate_website_cert') {
+                $user = $args[1];
+                $domains = array();
+                for ($i = 2; $i < count($args); $i++) {
+                    $domains[] = $args[$i];
+                }
+                $this->generate_website_cert( $user, $domains );
+            }          
+            return $args;
         }
 
         /**
@@ -213,13 +176,51 @@ if ( ! class_exists( 'CG_PWS') ) {
         }
 
         /**
-         * Ensure that the master certificate is generated upon boot.
+         * Ensure that the master certificate and ssh keypair is generated upon boot.
          */
         public function nodeapp_resurrect_apps( $cmd ) {
+            // TODO: generate ssh keypair for pws, debian, and make it avail to /media/appFolder
             if ( ! file_exists( '/media/appFolder/pws.crt') || ! file_exists( '/media/appFolder/pws.key' ) ) {
                 $this->generate_master_cert();
             }
             return $cmd;
+        }
+
+        /**
+         * Intercept web edit save, ensure ssl crt/key are not empty; suppresing
+         * the empty error message as we'll generate a certificate on the fly.
+         */
+        public function render_page( $args ) {
+            if ( $args['page'] == 'edit_web' ) {
+                $code = '<script>
+                // Get references to the necessary elements
+                const sslCheckbox = document.getElementById("v_ssl");
+                const sslCrtTextarea = document.getElementById("ssl_crt");
+                const sslKeyTextarea = document.getElementById("v_ssl_key");
+                const form = document.getElementById("vstobjects");
+                const saveButton = form.querySelector("button[type=\"submit\"]");
+                form.addEventListener("submit", function(event) {
+                    if (sslCheckbox.checked) {
+                        if (sslCrtTextarea.value.trim() == "") {
+                            sslCrtTextarea.value = "     ";
+                        }
+                        if (sslKeyTextarea.value.trim() == "") {
+                            sslKeyTextarea.value = "     ";
+                        }
+                    }
+                    return true;
+                });</script>
+                <style>
+                    /* Hide native generate csr link */
+                    #generate-csr {
+                        display: none;
+                    }
+                </style>';
+                $content = $args['content'];
+                $content = str_replace( '</form>', '</form>' . $code, $content );
+                $args['content'] = $content;
+            }
+            return $args;
         }
     }
     new CG_PWS(); 
