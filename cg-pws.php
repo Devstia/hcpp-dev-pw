@@ -203,9 +203,10 @@ if ( ! class_exists( 'CG_PWS') ) {
                         $domain = $file->getFilename();
                         $cg_crt = "$path/$domain/cg_pws_ssl/$domain.crt";
                         $ssl_crt = "$path/$domain/ssl/$domain.crt";
-                        if ( ! file_exists( $cg_crt ) && ! file_exists( $ssl_crt ) ) continue;
-                        if ( md5_file( $cg_crt ) == md5_file( $ssl_crt ) ) {
-                            echo "Regenerating certificate for $domain\n";
+                        if ( file_exists( $cg_crt ) && file_exists( $ssl_crt ) ) {
+                            if ( md5_file( $cg_crt ) == md5_file( $ssl_crt ) ) {
+                                echo "Regenerating certificate for $domain\n";
+                            }
                         }
                     }
                 }
