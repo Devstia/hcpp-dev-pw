@@ -191,22 +191,23 @@ if ( ! class_exists( 'CG_PWS') ) {
 
         /**
          * Regenerate the master and all website certificates.
-         */ 
+         */
         public function regenerate_certificates() {
             global $hcpp;
             $hcpp->log( 'Regenerating certificates...' );
-            
-            // Gather list of existing certificates that are based on cg_pws_ssl
             $path = '/home/pws/conf/web';
-            $domains = [];
-            $directory = new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS);
-            $iterator = new RecursiveIteratorIterator($directory, RecursiveIteratorIterator::SELF_FIRST);
-            foreach ($iterator as $file) {
-                if ($file->isDir()) {
-                    $domain = $file->getFilename();
-                    echo $file . "\n";
-                    echo $domain . "\n";
-                    $domains[] = $domain;
+            if ( is_dir($path) ) {
+                $directory = new DirectoryIterator( $path );
+                foreach ( $directory as $file ) {
+                    if ( $file->isDir() && !$file->isDot() ) {
+                        $domain = $file->getFilename();
+                        $cg_crt = "$path/$domain/cg_pws_ssl/$domain.crt";
+                        $ssl_crt = "$path/$domain/ssl/$domain.crt";
+                        if ( ! file_exists( $cg_crt ) && ! file_exists( $ssl_crt ) ) continue;
+                        if ( md5_file( $cg_crt ) == md5_file( $ssl_crt ) ) {
+                            echo "Regenerating certificate for $domain\n";
+                        }
+                    }
                 }
             }
         }
