@@ -205,6 +205,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                         $ssl_crt = "$path/$domain/ssl/$domain.crt";
                         if ( file_exists( $cg_crt ) && file_exists( $ssl_crt ) ) {
                             if ( md5_file( $cg_crt ) == md5_file( $ssl_crt ) ) {
+                                $hcpp->log( 'Regenerating certificate for ' . $domain );
                                 $detail = $hcpp->run( "list-web-domain pws $domain json" );
                                 $domains = $detail[$domain]['ALIAS'];
                                 $domains = explode(",", $domains);
@@ -215,6 +216,9 @@ if ( ! class_exists( 'CG_PWS') ) {
                     }
                 }
             }
+            $cmd = '(service nginx reload) > /dev/null 2>&1 &';
+            $cmd = $hcpp->do_action( 'cg_pws_nginx_reload', $cmd );
+            shell_exec( $cmd );
         }
 
         /**
