@@ -206,6 +206,10 @@ if ( ! class_exists( 'CG_PWS') ) {
                         if ( file_exists( $cg_crt ) && file_exists( $ssl_crt ) ) {
                             if ( md5_file( $cg_crt ) == md5_file( $ssl_crt ) ) {
                                 echo "Regenerating certificate for $domain\n";
+                                $detail = $hcpp->run( "list-web-domain pws $domain json" );
+                                $domains = explode( " ", $detail[$domain]['ALIAS'] );
+                                array_unshift( $domains, $domain );
+                                echo "Domains: " . implode( ", ", $domains ) . "\n";
                             }
                         }
                     }
