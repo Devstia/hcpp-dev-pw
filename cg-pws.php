@@ -98,7 +98,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd .= 'rm -f ./pws.key 2>/dev/null && ';
             $cmd .= 'openssl  genrsa -out ./pws.key 2048 2>&1 && ';
             $cmd .= 'rm -f ./pws.crt 2>/dev/null && ';
-            $cmd .= 'openssl req -x509 -new -nodes -key ./pws.key -sha256 -days 825 -out ./pws.crt -subj "/C=US/ST=California/L=San Diego/O=CodeGarden PWS/OU=Customers/CN=dev.cc" 2>&1 && ';
+            $cmd .= 'openssl req -x509 -new -nodes -key ./pws.key -sha256 -days 825 -out ./pws.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=CodeGarden PWS/CN=dev.cc" 2>&1 && ';
             $cmd .= 'rm -f /usr/local/share/ca-certificates/pws && ';
             $cmd .= 'mkdir -p /usr/local/share/ca-certificates/pws && ';
             $cmd .= 'cp ./pws.crt /usr/local/share/ca-certificates/pws/pws.crt && ';
@@ -149,8 +149,8 @@ if ( ! class_exists( 'CG_PWS') ) {
             $template .= "countryName = US\n";
             $template .= "stateOrProvinceName = California\n";
             $template .= "localityName = San Diego\n";
-            $template .= "organizationName = Code Garden\n";
-            $template .= "organizationalUnitName = IT Department\n";
+            $template .= "organizationName = Virtuosoft\n";
+            $template .= "organizationalUnitName = CodeGarden PWS\n";
             $template .= "commonName = $domains[0]\n";
             $template .= "\n";
             $template = $hcpp->do_action( 'cg_pws_generate_website_cert_template', $template );
@@ -196,6 +196,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             global $hcpp;
             $hcpp->log( 'Regenerating certificates...' );
             $path = '/home/pws/conf/web';
+            $this->generate_master_cert();
             if ( is_dir($path) ) {
                 $directory = new DirectoryIterator( $path );
                 foreach ( $directory as $file ) {
