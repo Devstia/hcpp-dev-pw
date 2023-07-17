@@ -17,7 +17,7 @@ if ( ! class_exists( 'CG_PWS') ) {
          */
         public function __construct() {
             global $hcpp;
-            $hcpp->collabora = $this;
+            $hcpp->cg_pws = $this;
             $hcpp->add_action( 'invoke_plugin', [ $this, 'invoke_plugin' ] );
             $hcpp->add_action( 'new_web_domain_ready', [ $this, 'new_web_domain_ready' ] );
             $hcpp->add_action( 'csrf_verified', [ $this, 'csrf_verified' ] );
