@@ -183,8 +183,17 @@ if ( ! class_exists( 'CG_PWS') ) {
          */
         public function nodeapp_resurrect_apps( $cmd ) {
             // TODO: generate ssh keypair for pws, debian, and make it avail to /media/appFolder
-            if ( ! file_exists( '/media/appFolder/pws.crt') || ! file_exists( '/media/appFolder/pws.key' ) ) {
-                $this->generate_master_cert();
+            $files = [
+                '/usr/local/share/ca-certificates/pws/pws.crt', 
+                '/usr/local/share/ca-certificates/pws/pws.key',
+                '/media/appFolder/pws.crt',
+                '/media/appFolder/pws.key'
+            ];
+            foreach ( $files as $file ) {
+                if ( ! file_exists( $file ) ) {
+                    $this->generate_master_cert();
+                    break;
+                }
             }
             return $cmd;
         }
