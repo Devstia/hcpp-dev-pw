@@ -242,7 +242,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 const sslCheckbox = document.getElementById("v_ssl");
                 const sslCrtTextarea = document.getElementById("ssl_crt");
                 const sslKeyTextarea = document.getElementById("v_ssl_key");
-                const form = document.getElementById("vstobjects");
+                const form = document.getElementById("main-form");
                 const saveButton = form.querySelector("button[type=\"submit\"]");
                 form.addEventListener("submit", function(event) {
                     if (sslCheckbox.checked) {
