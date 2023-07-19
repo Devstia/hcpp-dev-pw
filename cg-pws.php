@@ -88,18 +88,18 @@ if ( ! class_exists( 'CG_PWS') ) {
         }
 
         /**
-         * Generate the master certificate for PWS, this will overwrite
+         * Generate the master certificate for HestiaCP, PWS. This will overwrite
          * any existing certificate if one already exists; then add it
          * to the system trusted certificates.
          */
         public function generate_master_cert() {
             $path = '/media/appFolder';
-            $cmd = 'cd ' . escapeshellarg( $path ) . ' && ';
+            $cmd = 'cd ' . $path . ' && ';
             $cmd .= 'rm -f ./pws.key 2>/dev/null && ';
             $cmd .= 'openssl  genrsa -out ./pws.key 2048 2>&1 && ';
             $cmd .= 'rm -f ./pws.crt 2>/dev/null && ';
             $cmd .= 'openssl req -x509 -new -nodes -key ./pws.key -sha256 -days 825 -out ./pws.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=CodeGarden PWS/CN=dev.cc" 2>&1 && ';
-            $cmd .= 'rm -f /usr/local/share/ca-certificates/pws && ';
+            $cmd .= 'rm -rf /usr/local/share/ca-certificates/pws && ';
             $cmd .= 'mkdir -p /usr/local/share/ca-certificates/pws && ';
             $cmd .= 'cp ./pws.crt /usr/local/share/ca-certificates/pws/pws.crt && ';
             $cmd .= 'cp ./pws.key /usr/local/share/ca-certificates/pws/pws.key && ';
@@ -107,6 +107,10 @@ if ( ! class_exists( 'CG_PWS') ) {
             global $hcpp;
             $cmd = $hcpp->do_action( 'cg_pws_generate_master_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
+
+            // Generate local.dev.cc for the control panel itself
+            $hcpp->log( "Generating local.dev.cc certificate" );
+            $this->generate_website_cert( 'admin', [ 'local.dev.cc' ] );
         }
 
         /**
@@ -118,6 +122,7 @@ if ( ! class_exists( 'CG_PWS') ) {
          */
         public function generate_website_cert( $user, $domains ) {
             global $hcpp;
+            $hcpp->log( "In generate_website_cert" );
             if ( ! is_dir( '/home/' . $user . '/conf/web/' . $domains[0] ) ) {
                 $hcpp->log( 'Error - user ' . $user . ' or website ' . $domains[0] . ' does not exist, skipping certificate generation.');
                 return;
@@ -127,6 +132,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cg_pws_ssl = '/home/' . $user . '/conf/web/' . $domains[0] . '/cg_pws_ssl';
             $cmd = 'rm -rf ' . $cg_pws_ssl . ' && ';
             $cmd .= 'mkdir -p ' . $cg_pws_ssl;
+            $hcpp->log( $cmd );
             shell_exec( $cmd );
 
             // Write the template.cnf file
