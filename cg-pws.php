@@ -18,8 +18,8 @@ if ( ! class_exists( 'CG_PWS') ) {
         public function __construct() {
             global $hcpp;
             $hcpp->cg_pws = $this;
-            $hcpp->add_action( 'invoke_plugin', [ $this, 'invoke_plugin' ] );
-            $hcpp->add_action( 'new_web_domain_ready', [ $this, 'new_web_domain_ready' ] );
+            $hcpp->add_action( 'hcpp_invoke_plugin', [ $this, 'hcpp_invoke_plugin' ] );
+            $hcpp->add_action( 'hcpp_new_domain_ready', [ $this, 'hcpp_new_domain_ready' ] );
             $hcpp->add_action( 'csrf_verified', [ $this, 'csrf_verified' ] );
             $hcpp->add_action( 'render_page', [ $this, 'render_page' ] );
             $hcpp->add_action( 'nodeapp_resurrect_apps', [ $this, 'nodeapp_resurrect_apps' ] );
@@ -69,7 +69,7 @@ if ( ! class_exists( 'CG_PWS') ) {
         }
 
         // Generate certs on demand
-        public function invoke_plugin( $args ) {
+        public function hcpp_invoke_plugin( $args ) {
             if ( $args[0] == 'generate_master_cert' ) {
                 $this->generate_master_cert();
             }
@@ -171,7 +171,7 @@ if ( ! class_exists( 'CG_PWS') ) {
         /**
          * Generate a certificate for the website domain.
          */
-        public function new_web_domain_ready( $args ) {
+        public function hcpp_new_domain_ready( $args ) {
             $user = $args[0];
             $domain = $args[1];
             $this->generate_website_cert( $user, array( $domain ) );
