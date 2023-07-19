@@ -22,7 +22,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'hcpp_new_domain_ready', [ $this, 'hcpp_new_domain_ready' ] );
             $hcpp->add_action( 'csrf_verified', [ $this, 'csrf_verified' ] );
             $hcpp->add_action( 'render_page', [ $this, 'render_page' ] );
-            $hcpp->add_action( 'nodeapp_resurrect_apps', [ $this, 'nodeapp_resurrect_apps' ] );
+            $hcpp->add_action( 'hcpp_rebooted', [ $this, 'hcpp_rebooted' ] );
         }
 
         /**
@@ -181,7 +181,7 @@ if ( ! class_exists( 'CG_PWS') ) {
         /**
          * Ensure that the master certificate and ssh keypair is generated upon boot.
          */
-        public function nodeapp_resurrect_apps( $cmd ) {
+        public function hcpp_rebooted() {
             // TODO: generate ssh keypair for pws, debian, and make it avail to /media/appFolder
             $files = [
                 '/usr/local/share/ca-certificates/pws/pws.crt', 
@@ -195,7 +195,6 @@ if ( ! class_exists( 'CG_PWS') ) {
                     break;
                 }
             }
-            return $cmd;
         }
 
         /**
