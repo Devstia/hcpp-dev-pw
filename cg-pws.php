@@ -194,6 +194,8 @@ if ( ! class_exists( 'CG_PWS') ) {
          */
         public function hcpp_rebooted() {
             // TODO: generate ssh keypair for pws, debian, and make it avail to /media/appFolder
+            global $hcpp;
+            $hcpp->log( 'CG-PWS hcpp_rebooted called' );
             $files = [
                 '/home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.crt',
                 '/home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.key',
