@@ -127,7 +127,6 @@ if ( ! class_exists( 'CG_PWS') ) {
          */
         public function generate_website_cert( $user, $domains ) {
             global $hcpp;
-            $hcpp->log( "In generate_website_cert" );
             if ( ! is_dir( '/home/' . $user . '/conf/web/' . $domains[0] ) ) {
                 $hcpp->log( 'Error - user ' . $user . ' or website ' . $domains[0] . ' does not exist, skipping certificate generation.');
                 return;
@@ -173,8 +172,9 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd .= 'openssl x509 -req -in ./' . $domains[0] . '.csr -CA /media/appFolder/pws.crt -CAkey /media/appFolder/pws.key -CAcreateserial -out ./' . $domains[0] . '.crt -days 825 -sha256 -extfile ./template.cnf && ';
             $cmd .= 'cat ./' . $domains[0] . '.key ./' . $domains[0] . '.crt > ./' . $domains[0] . '.pem && ';
             $cmd .= 'chmod -R 644 ./ && ';
-            $cmd .= '/usr/local/hestia/bin/v-delete-web-domain-ssl ' . $user . ' ' . $domains[0] . ' ; ';
-            $cmd .= '/usr/local/hestia/bin/v-add-web-domain-ssl ' . $user . ' ' . $domains[0] . ' /home/' . $user . '/conf/web/' . $domains[0] . '/cg_pws_ssl';
+            $cmd .= '/usr/local/hestia/bin/v-delete-web-domain-ssl ' . $user . ' ' . $domains[0] . ' "no" ; ';
+            $cmd .= '/usr/local/hestia/bin/v-add-web-domain-ssl ' . $user . ' ' . $domains[0] . ' /home/' . $user . '/conf/web/' . $domains[0] . '/cg_pws_ssl && ';
+            $cmd .= '/usr/local/hestia/bin/v-add-web-domain-ssl-force ' . $user . ' ' . $domains[0]; 
             $cmd = $hcpp->do_action( 'cg_pws_generate_website_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
         }
