@@ -111,6 +111,11 @@ if ( ! class_exists( 'CG_PWS') ) {
             // Generate local.dev.cc for the control panel itself
             $hcpp->log( "Generating local.dev.cc certificate" );
             $this->generate_website_cert( 'admin', [ 'local.dev.cc' ] );
+
+            // Update the Hestia nginx certificate
+            $cmd = 'cp /home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.crt /usr/local/hestia/ssl/certificate.crt && ';
+            $cmd .= 'cp /home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.key /usr/local/hestia/ssl/certificate.key';
+            $hcpp->log( shell_exec( $cmd ) );
         }
 
         /**
@@ -190,6 +195,8 @@ if ( ! class_exists( 'CG_PWS') ) {
         public function hcpp_rebooted() {
             // TODO: generate ssh keypair for pws, debian, and make it avail to /media/appFolder
             $files = [
+                '/home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.crt',
+                '/home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.key',
                 '/usr/local/share/ca-certificates/pws/pws.crt', 
                 '/usr/local/share/ca-certificates/pws/pws.key',
                 '/media/appFolder/pws.crt',
