@@ -114,7 +114,9 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // Update the Hestia nginx certificate
             $cmd = 'cp /home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.crt /usr/local/hestia/ssl/certificate.crt && ';
-            $cmd .= 'cp /home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.key /usr/local/hestia/ssl/certificate.key';
+            $cmd .= 'cp /home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.key /usr/local/hestia/ssl/certificate.key && ';
+            $cmd .= 'service hestia restart';
+            $cmd = $hcpp->do_action( 'cg_pws_update_hestia_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
         }
 
