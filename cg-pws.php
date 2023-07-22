@@ -249,6 +249,8 @@ if ( ! class_exists( 'CG_PWS') ) {
         /**
          * Intercept web edit save, ensure ssl crt/key are not empty; suppresing
          * the empty error message as we'll generate a certificate on the fly.
+         * 
+         * White label list_services page
          */
         public function render_page( $args ) {
             if ( $args['page'] == 'edit_web' ) {
@@ -278,6 +280,11 @@ if ( ! class_exists( 'CG_PWS') ) {
                 </style>';
                 $content = $args['content'];
                 $content = str_replace( '</form>', '</form>' . $code, $content );
+                $args['content'] = $content;
+            }
+            if ( $args['page'] ) == 'list_services' ) {
+                $content = $args['content'];
+                $content = str_replace( 'Hestia Control Panel', 'CodeGarden PWS', $content );
                 $args['content'] = $content;
             }
             return $args;
