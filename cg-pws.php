@@ -282,7 +282,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $content = str_replace( '</form>', '</form>' . $code, $content );
                 $args['content'] = $content;
             }
-            if ( $args['page'] ) == 'list_services' ) {
+            if ( $args['page'] == 'list_services' ) {
                 $content = $args['content'];
                 $content = str_replace( 'Hestia Control Panel', 'CodeGarden PWS', $content );
                 $args['content'] = $content;
