@@ -118,6 +118,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd .= 'service hestia restart';
             $cmd = $hcpp->do_action( 'cg_pws_update_hestia_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
+
         }
 
         /**

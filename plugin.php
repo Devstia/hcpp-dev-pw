@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CG-PWS
  * Plugin URI: https://github.com/virtuosoft-dev/hcpp-cg-pws
- * Description: Code Garden Personal Web Server plugin for HestiaCP enables Code Garden features on the desktop app.
+ * Description: CodeGarden Personal Web Server plugin for HestiaCP enables CodeGarden features on the desktop app.
  * Version: 1.0.0
  * Author: Stephen J. Carnam
  *

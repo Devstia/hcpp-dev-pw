@@ -1,5 +1,5 @@
 # hcpp-cg-pws
-Code Garden Personal Web Server plugin for HestiaCP enables Code Garden features on the desktop app.
+CodeGarden Personal Web Server plugin for HestiaCP enables CodeGarden features on the desktop app.
 
 &nbsp;
  > :warning: !!! Note: this repo is in progress; when completed, a release will appear in the release tab.
@@ -38,7 +38,7 @@ touch "/usr/local/hestia/data/hcpp/installed/cg-pws"
 This plugin will modify Hestia and the included development stack to accommodate local development. This includes, but is not limited to:
 
 * Creating a root self-signed certificate for automated SSL website development. 
-* Furnishing cutting edge bug fixes and functionality geared towards local development with Code Garden Personal Web Server. 
+* Furnishing cutting edge bug fixes and functionality geared towards local development with CodeGarden Personal Web Server. 
    
 <br>
 
