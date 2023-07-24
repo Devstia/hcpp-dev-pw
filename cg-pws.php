@@ -289,6 +289,19 @@ if ( ! class_exists( 'CG_PWS') ) {
             }
             return $args;
         }
+
+        // TODO: QUICKSTART Wizard
+        // <!-- Quickstart tab -->
+        // <li class="main-menu-item">
+        //     <a class="main-menu-item-link active" href="/list/user/" title="Easy-to-use guide">
+        //         <p class="main-menu-item-label">QUICKSTART<i class="fas fa-flag-checkered"></i></p>
+        //         <ul class="main-menu-stats">
+        //             <li> easy-to-use </li>
+        //             <li> guide </li>
+        //         </ul>
+        //     </a>
+        // </li>
+        
     }
     new CG_PWS(); 
 } 
