@@ -20,8 +20,8 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->cg_pws = $this;
             $hcpp->add_action( 'hcpp_invoke_plugin', [ $this, 'hcpp_invoke_plugin' ] );
             $hcpp->add_action( 'hcpp_new_domain_ready', [ $this, 'hcpp_new_domain_ready' ] );
-            $hcpp->add_action( 'csrf_verified', [ $this, 'csrf_verified' ] );
-            $hcpp->add_action( 'render_page', [ $this, 'render_page' ] );
+            $hcpp->add_action( 'hcpp_csrf_verified', [ $this, 'hcpp_csrf_verified' ] );
+            $hcpp->add_action( 'hcpp_render_page', [ $this, 'hcpp_render_page' ] );
             $hcpp->add_action( 'hcpp_rebooted', [ $this, 'hcpp_rebooted' ] );
         }
 
@@ -29,7 +29,7 @@ if ( ! class_exists( 'CG_PWS') ) {
          * Capture edit web form submission, and generate a new certificate
          * if ssl option is checked and crt/key are empty.
          */
-        public function csrf_verified() {
+        public function hcpp_csrf_verified() {
             global $hcpp;
             if ( $_SERVER['PHP_SELF'] != '/edit/web/index.php' ) return;
             if ( ! isset( $_REQUEST['v_ftp_pre_path'] ) ) return;
@@ -252,7 +252,7 @@ if ( ! class_exists( 'CG_PWS') ) {
          * 
          * White label list_services page
          */
-        public function render_page( $args ) {
+        public function hcpp_render_page( $args ) {
             if ( $args['page'] == 'edit_web' ) {
                 $code = '<script>
                 // Get references to the necessary elements
