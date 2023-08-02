@@ -2,7 +2,7 @@
 
 # PWS branding and conveinence features
 /usr/local/hestia/bin/v-change-sys-config-value LOGIN_STYLE old
-cp -r /usr/local/hestia/plugns/images/* /usr/local/hestia/web/images/
+cp -r /usr/local/hestia/plugins/cg-pws/images/* /usr/local/hestia/web/images/
 
 # Notify installation has finished
 /usr/local/hestia/bin/v-add-user-notification admin CG-PWS "<span>&#127811;</span> CG-PWS plugin has finished installing."
