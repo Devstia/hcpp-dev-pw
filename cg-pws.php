@@ -214,7 +214,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             ];
             foreach ( $files as $file ) {
                 if ( ! file_exists( $file ) ) {
-                    $this->generate_master_cert();
+                    $this->regenerate_certificates(); // Generate the master and all website certificates.
                     break;
                 }
             }
