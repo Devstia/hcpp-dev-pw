@@ -137,6 +137,8 @@ if ( ! class_exists( 'CG_PWS') ) {
          */
         public function generate_website_cert( $user, $domains ) {
             global $hcpp;
+            $hcpp->log( "generate_website_cert for $user" );
+            $hcpp->log( $domains );
             if ( ! is_dir( '/home/' . $user . '/conf/web/' . $domains[0] ) ) {
                 $hcpp->log( 'Error - user ' . $user . ' or website ' . $domains[0] . ' does not exist, skipping certificate generation.');
                 return;
