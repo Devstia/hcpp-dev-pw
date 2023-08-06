@@ -117,7 +117,7 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // Generate local.dev.cc for the control panel itself
             $hcpp->log( "Generating local.dev.cc certificate" );
-            $this->generate_website_cert( 'admin', [ 'local.dev.cc' ] );
+            $this->generate_website_cert( 'admin', [ 'local.dev.cc', 'localhost' ] );
 
             // Update the Hestia nginx certificate
             $cmd = 'cp /home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.crt /usr/local/hestia/ssl/certificate.crt && ';
@@ -241,9 +241,11 @@ if ( ! class_exists( 'CG_PWS') ) {
                             if ( md5_file( $cg_crt ) == md5_file( $ssl_crt ) ) {
                                 $hcpp->log( 'Regenerating certificate for ' . $domain );
                                 $detail = $hcpp->run( "list-web-domain pws $domain json" );
-                                $domains = $detail[$domain]['ALIAS'];
-                                $domains = explode(",", $domains);
-                                array_unshift( $domains, $domain );
+                                if ( $detail != NULL ) {
+                                    $domains = $detail[$domain]['ALIAS'];
+                                    $domains = explode(",", $domains);
+                                    array_unshift( $domains, $domain );
+                                }
                                 $this->generate_website_cert( 'pws', $domains );
                             }
                         }
