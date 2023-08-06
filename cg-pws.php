@@ -244,6 +244,8 @@ if ( ! class_exists( 'CG_PWS') ) {
                                 $domains = $detail[$domain]['ALIAS'];
                                 $domains = explode(",", $domains);
                                 array_unshift( $domains, $domain );
+                            }else {
+                                $domains = array( $domain );
                             }
                             $this->generate_website_cert( 'pws', $domains );
                         }
