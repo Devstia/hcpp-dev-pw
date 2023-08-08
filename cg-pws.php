@@ -198,6 +198,8 @@ if ( ! class_exists( 'CG_PWS') ) {
             $user = $args[0];
             $domain = $args[1];
             $this->generate_website_cert( $user, array( $domain ) );
+            global $hcpp;
+            $hcpp->run( 'add-web-domain-ssl-force ' . $user . ' ' . $domain . ' no ');
             return $args;
         }
 
