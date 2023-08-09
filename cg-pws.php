@@ -180,7 +180,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd = 'cd ' . $cg_pws_ssl . ' && ';
             $cmd .= 'openssl genrsa -out ./' . $domains[0] . '.key 2048 && ';
             $cmd .= 'openssl req -new -key ./' . $domains[0] . '.key -out ./' . $domains[0] . ".csr -subj '/CN=" . $domains[0] . "'" . ' -config ./template.cnf && ';
-            $cmd .= 'openssl x509 -req -in ./' . $domains[0] . '.csr -CA /usr/local/share/ca-certificates/pws.crt -CAkey /usr/local/share/ca-certificates/pws.key -CAcreateserial -out ./' . $domains[0] . '.crt -days 825 -sha256 -extfile ./template.cnf && ';
+            $cmd .= 'openssl x509 -req -in ./' . $domains[0] . '.csr -CA /usr/local/share/ca-certificates/pws/pws.crt -CAkey /usr/local/share/ca-certificates/pws/pws.key -CAcreateserial -out ./' . $domains[0] . '.crt -days 825 -sha256 -extfile ./template.cnf && ';
             $cmd .= 'cat ./' . $domains[0] . '.key ./' . $domains[0] . '.crt > ./' . $domains[0] . '.pem && ';
             $cmd .= 'chmod -R 644 ./ && ';
             $cmd .= '/usr/local/hestia/bin/v-delete-web-domain-ssl ' . $user . ' ' . $domains[0] . ' "no" ; ';
