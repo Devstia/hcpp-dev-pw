@@ -63,7 +63,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
                 $domains = array_map( 'trim', $lines );
                 array_unshift($domains, $_REQUEST['v_domain'] );
-                $args = [ 'generate_website_cert', $user ];
+                $args = [ 'cg_pws_generate_website_cert', $user ];
                 $args = array_merge( $args, $domains );
                 $hcpp->log( $hcpp->run( 'invoke-plugin ' . implode( ' ', $args ) ) );    
             }
@@ -71,10 +71,10 @@ if ( ! class_exists( 'CG_PWS') ) {
 
         // Generate certs on demand
         public function hcpp_invoke_plugin( $args ) {
-            if ( $args[0] == 'generate_master_cert' ) {
+            if ( $args[0] == 'cg_pws_generate_master_cert' ) {
                 $this->generate_master_cert();
             }
-            if ( $args[0] == 'generate_website_cert') {
+            if ( $args[0] == 'cg_pws_generate_website_cert') {
                 $user = $args[1];
                 $domains = array();
                 for ($i = 2; $i < count($args); $i++) {
@@ -82,7 +82,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 }
                 $this->generate_website_cert( $user, $domains );
             }
-            if ( $args[0] == 'regenerate_certificates' ) {
+            if ( $args[0] == 'cg_pws_regenerate_certificates' ) {
                 $this->regenerate_certificates();
             }
             return $args;
@@ -222,6 +222,12 @@ if ( ! class_exists( 'CG_PWS') ) {
                     break;
                 }
             }
+
+            // Always copy the ca-certificates back to the appFolder
+            global $hcpp;
+            $cmd = 'cp /usr/local/share/ca-certificates/pws/pws.crt /media/appFolder/pws.crt && ';
+            $cmd .= 'cp /usr/local/share/ca-certificates/pws/pws.key /media/appFolder/pws.key';
+            $cmd = $hcpp->do_action( 'cg_pws_copy_ca_certificates', $cmd );
         }
 
         /**
