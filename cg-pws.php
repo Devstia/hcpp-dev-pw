@@ -100,17 +100,17 @@ if ( ! class_exists( 'CG_PWS') ) {
          * to the system trusted certificates.
          */
         public function generate_master_cert() {
-            $path = '/media/appFolder';
-            $cmd = 'cd ' . $path . ' && ';
-            $cmd .= 'rm -f ./pws.key 2>/dev/null && ';
+
+            // Generate the master certificate
+            $pws_folder = '/usr/local/share/ca-certificates/pws';
+            $app_folder = '/media/appFolder';
+            $cmd = "rm -rf $pws_folder && mkdir -p $pws_folder && cd $pws_folder && ";
             $cmd .= 'openssl  genrsa -out ./pws.key 2048 2>&1 && ';
-            $cmd .= 'rm -f ./pws.crt 2>/dev/null && ';
             $cmd .= 'openssl req -x509 -new -nodes -key ./pws.key -sha256 -days 825 -out ./pws.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=CodeGarden PWS/CN=dev.cc" 2>&1 && ';
-            $cmd .= 'rm -rf /usr/local/share/ca-certificates/pws && ';
-            $cmd .= 'mkdir -p /usr/local/share/ca-certificates/pws && ';
-            $cmd .= 'cp ./pws.crt /usr/local/share/ca-certificates/pws/pws.crt && ';
-            $cmd .= 'cp ./pws.key /usr/local/share/ca-certificates/pws/pws.key && ';
             $cmd .= 'update-ca-certificates 2>&1';
+
+            // Copy the master certificate to the appFolder
+            $cmd .= 'cp ./pws.crt ' . $app_folder . '/pws.crt ; cp ./pws.key ' . $app_folder . '/pws.key';
             global $hcpp;
             $cmd = $hcpp->do_action( 'cg_pws_generate_master_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
@@ -125,7 +125,6 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd .= 'service hestia restart';
             $cmd = $hcpp->do_action( 'cg_pws_update_hestia_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
-
         }
 
         /**
