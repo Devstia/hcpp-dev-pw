@@ -223,7 +223,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 }
             }
 
-            // Always copy the ca-certificates back to the appFolder
+            // Always copy the ca-certificates back to the appFolder on reboot
             global $hcpp;
             $cmd = 'cp /usr/local/share/ca-certificates/pws/pws.crt /media/appFolder/pws.crt && ';
             $cmd .= 'cp /usr/local/share/ca-certificates/pws/pws.key /media/appFolder/pws.key';
