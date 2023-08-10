@@ -107,7 +107,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd = "rm -rf $pws_folder && mkdir -p $pws_folder && cd $pws_folder && ";
             $cmd .= 'openssl  genrsa -out ./pws.key 2048 2>&1 && ';
             $cmd .= 'openssl req -x509 -new -nodes -key ./pws.key -sha256 -days 825 -out ./pws.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=CodeGarden PWS/CN=dev.cc" 2>&1 && ';
-            $cmd .= 'update-ca-certificates 2>&1';
+            $cmd .= 'update-ca-certificates 2>&1 && ';
 
             // Copy the master certificate to the appFolder
             $cmd .= 'cp ./pws.crt ' . $app_folder . '/pws.crt ; cp ./pws.key ' . $app_folder . '/pws.key';
