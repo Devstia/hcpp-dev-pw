@@ -227,6 +227,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd = 'cp /usr/local/share/ca-certificates/pws/pws.crt /media/appFolder/pws.crt ; ';
             $cmd .= 'cp /usr/local/share/ca-certificates/pws/pws.key /media/appFolder/pws.key';
             $cmd = $hcpp->do_action( 'cg_pws_copy_ca_certificates', $cmd );
+            $hcpp->log( shell_exec( $cmd ) );
         }
 
         /**
