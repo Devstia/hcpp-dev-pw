@@ -22,7 +22,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'hcpp_invoke_plugin', [ $this, 'hcpp_invoke_plugin' ] );
             $hcpp->add_action( 'hcpp_new_domain_ready', [ $this, 'hcpp_new_domain_ready' ] );
             $hcpp->add_action( 'hcpp_csrf_verified', [ $this, 'hcpp_csrf_verified' ] );
-            $hcpp->add_action( 'hcpp_render_page', [ $this, 'hcpp_render_page' ] );
+            $hcpp->add_action( 'hcpp_render_body', [ $this, 'hcpp_render_body' ] );
             $hcpp->add_action( 'hcpp_rebooted', [ $this, 'hcpp_rebooted' ] );
         }
 
@@ -271,7 +271,7 @@ if ( ! class_exists( 'CG_PWS') ) {
          * 
          * White label list_services page
          */
-        public function hcpp_render_page( $args ) {
+        public function hcpp_render_body( $args ) {
             if ( $args['page'] == 'edit_web' ) {
                 $code = '<script>
                 // Get references to the necessary elements
