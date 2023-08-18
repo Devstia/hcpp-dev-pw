@@ -237,6 +237,8 @@ if ( ! class_exists( 'CG_PWS') ) {
             $sshFiles = [
                 '/home/pws/.ssh/id_rsa',
                 '/home/pws/.ssh/id_rsa.pub',
+                '/home/debian/.ssh/id_rsa',
+                '/home/debian/.ssh/id_rsa.pub',
                 '/media/appFolder/security/ssh/debian_rsa',
                 '/media/appFolder/security/ssh/debian_rsa.pub',
                 '/media/appFolder/security/ssh/pws_rsa',
