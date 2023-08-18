@@ -85,6 +85,9 @@ if ( ! class_exists( 'CG_PWS') ) {
             if ( $args[0] == 'cg_pws_regenerate_certificates' ) {
                 $this->regenerate_certificates();
             }
+            if ( $args[0] == 'cg_pws_regenerate_ssh_keys' ) {
+                $this->regenerate_ssh_keys();
+            }
             return $args;
         }
 
@@ -206,8 +209,8 @@ if ( ! class_exists( 'CG_PWS') ) {
          * Ensure that the master certificate and ssh keypair is generated upon boot.
          */
         public function hcpp_rebooted() {
-            // TODO: generate ssh keypair for pws, debian, and make it avail to /media/appFolder
-            $files = [
+            // Generate the master certificate if it doesn't exist
+            $caFiles = [
                 '/home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.crt',
                 '/home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.key',
                 '/usr/local/share/ca-certificates/pws/pws.crt', 
@@ -215,7 +218,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 '/media/appFolder/pws.crt',
                 '/media/appFolder/pws.key'
             ];
-            foreach ( $files as $file ) {
+            foreach ( $caFiles as $file ) {
                 if ( ! file_exists( $file ) ) {
                     $this->regenerate_certificates(); // Generate the master and all website certificates.
                     break;
@@ -224,10 +227,54 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // Always copy the ca-certificates back to the appFolder on reboot
             global $hcpp;
-            $cmd = 'cp /usr/local/share/ca-certificates/pws/pws.crt /media/appFolder/pws.crt ; ';
+            $cmd = 'rm -rf /media/appFolder/security/ca ; mkdir -p /media/appFolder/security/ca ; ';
+            $cmd .= 'cp /usr/local/share/ca-certificates/pws/pws.crt /media/appFolder/security/ca/pws.crt ; ';
             $cmd .= 'cp /usr/local/share/ca-certificates/pws/pws.key /media/appFolder/pws.key';
             $cmd = $hcpp->do_action( 'cg_pws_copy_ca_certificates', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
+
+            // Generate ssh keypair for pws, debian
+            $sshFiles = [
+                '/home/pws/.ssh/id_rsa',
+                '/home/pws/.ssh/id_rsa.pub',
+                '/media/appFolder/security/ssh/debian_rsa',
+                '/media/appFolder/security/ssh/debian_rsa.pub',
+                '/media/appFolder/security/ssh/pws_rsa',
+                '/media/appFolder/security/ssh/pws_rsa.pub'
+            ];
+            foreach ( $sshFiles as $file ) {
+                if ( ! file_exists( $file ) ) {
+                    $this->regenerate_ssh_keys(); // Generate the new ssh keys
+                    break;
+                }
+            }
+            // Always copy the ssh keypair back to the appFolder/security/ssh on reboot
+            $cmd = 'rm -rf /media/appFolder/security/ssh && mkdir -p /media/appFolder/security/ssh && ';
+            $cmd .= 'cp /home/debian/.ssh/id_rsa /media/appFolder/security/ssh/debian_rsa && ';
+            $cmd .= 'cp /home/debian/.ssh/id_rsa.pub /media/appFolder/security/ssh/debian_rsa.pub &&';
+            $cmd .= 'cp /home/pws/.ssh/id_rsa /media/appFolder/security/ssh/pws_rsa && ';
+            $cmd .= 'cp /home/pws/.ssh/id_rsa.pub /media/appFolder/security/ssh/pws_rsa.pub';
+        }
+
+        /**
+         * Generate a new ssh keypair for the pws and debian users.
+         */
+        public function regenerate_ssh_keys() {
+            global $hcpp;
+            $hcpp->log( 'Regenerating ssh keys for debian and pws...' );
+
+            // debian
+            $cmd = 'rm -rf /home/debian/.ssh && mkdir -p /home/debian/.ssh && ';
+            $cmd .= 'ssh-keygen -t rsa -b 4096 -f /home/debian/.ssh/id_rsa -q -N "" && ';
+            $cmd .= 'chown -R debian:debian /home/debian/.ssh && chmod -R 700 /home/debian/.ssh && ';
+
+            // pws
+            $cmd .= 'rm -rf /home/pws/.ssh && mkdir -p /home/pws/.ssh && ';
+            $cmd .= 'ssh-keygen -t rsa -b 4096 -f /home/pws/.ssh/id_rsa -q -N "" && ';
+            $cmd .= 'chown -R pws:pws /home/pws/.ssh && chmod -R 700 /home/pws/.ssh';
+
+            $cmd = $hcpp->do_action( 'cg_pws_regenerate_ssh_keys', $cmd );
+            shell_exec( $cmd );
         }
 
         /**
