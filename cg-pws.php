@@ -250,12 +250,17 @@ if ( ! class_exists( 'CG_PWS') ) {
                     break;
                 }
             }
-            // Always copy the ssh keypair back to the appFolder/security/ssh on reboot
+
+            // Always copy the ssh keys back to the appFolder/security/ssh on reboot
             $cmd = 'rm -rf /media/appFolder/security/ssh && mkdir -p /media/appFolder/security/ssh && ';
             $cmd .= 'cp /home/debian/.ssh/id_rsa /media/appFolder/security/ssh/debian_rsa && ';
             $cmd .= 'cp /home/debian/.ssh/id_rsa.pub /media/appFolder/security/ssh/debian_rsa.pub &&';
             $cmd .= 'cp /home/pws/.ssh/id_rsa /media/appFolder/security/ssh/pws_rsa && ';
-            $cmd .= 'cp /home/pws/.ssh/id_rsa.pub /media/appFolder/security/ssh/pws_rsa.pub';
+            $cmd .= 'cp /home/pws/.ssh/id_rsa.pub /media/appFolder/security/ssh/pws_rsa.pub && ';
+            $cmd .= 'cp /etc/ssh/ssh_host_ecdsa_key.pub /media/appFolder/security/ssh/ssh_host_ecdsa_key.pub && ';
+            $cmd .= 'cp /etc/ssh/ssh_host_rsa_key.pub /media/appFolder/security/ssh/ssh_host_rsa_key.pub';
+            $cmd = $hcpp->do_action( 'cg_pws_copy_ssh_keys', $cmd );
+            $hcpp->log( shell_exec( $cmd ) );
         }
 
         /**
