@@ -106,7 +106,7 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // Generate the master certificate
             $pws_folder = '/usr/local/share/ca-certificates/pws';
-            $app_folder = '/media/appFolder';
+            $app_folder = '/media/appFolder/security/ca';
             $cmd = "rm -rf $pws_folder && mkdir -p $pws_folder && cd $pws_folder && ";
             $cmd .= 'openssl  genrsa -out ./pws.key 2048 2>&1 && ';
             $cmd .= 'openssl req -x509 -new -nodes -key ./pws.key -sha256 -days 825 -out ./pws.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=CodeGarden PWS/CN=dev.cc" 2>&1 && ';
@@ -214,9 +214,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 '/home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.crt',
                 '/home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.key',
                 '/usr/local/share/ca-certificates/pws/pws.crt', 
-                '/usr/local/share/ca-certificates/pws/pws.key',
-                '/media/appFolder/pws.crt',
-                '/media/appFolder/pws.key'
+                '/usr/local/share/ca-certificates/pws/pws.key'
             ];
             foreach ( $caFiles as $file ) {
                 if ( ! file_exists( $file ) ) {
@@ -229,7 +227,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             global $hcpp;
             $cmd = 'rm -rf /media/appFolder/security/ca ; mkdir -p /media/appFolder/security/ca ; ';
             $cmd .= 'cp /usr/local/share/ca-certificates/pws/pws.crt /media/appFolder/security/ca/pws.crt ; ';
-            $cmd .= 'cp /usr/local/share/ca-certificates/pws/pws.key /media/appFolder/pws.key';
+            $cmd .= 'cp /usr/local/share/ca-certificates/pws/pws.key /media/appFolder/security/ca/pws.key';
             $cmd = $hcpp->do_action( 'cg_pws_copy_ca_certificates', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
 
