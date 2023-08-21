@@ -270,14 +270,18 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // debian
             $cmd = 'rm -rf /home/debian/.ssh && mkdir -p /home/debian/.ssh && ';
-            $cmd .= 'ssh-keygen -t rsa -b 4096 -f /home/debian/.ssh/id_rsa -q -N "" && ';
             $cmd .= 'chown -R debian:debian /home/debian/.ssh && chmod -R 700 /home/debian/.ssh && ';
+            $cmd .= 'runuser -l debian -c \'ssh-keygen -t rsa -b 4096 -f /home/debian/.ssh/id_rsa -q -N ""\' && ';
+            $cmd .= 'cp -f /home/debian/.ssh/id_rsa /home/debian/.ssh/authorized_keys && ';
+            $cmd .= 'chmod 600 /home/debian/.ssh/authorized_keys && ';
 
             // pws
             $cmd .= 'rm -rf /home/pws/.ssh && mkdir -p /home/pws/.ssh && ';
-            $cmd .= 'ssh-keygen -t rsa -b 4096 -f /home/pws/.ssh/id_rsa -q -N "" && ';
             $cmd .= 'chown -R pws:pws /home/pws/.ssh && chmod -R 700 /home/pws/.ssh';
-
+            $cmd .= 'runuser -l pws -c \'ssh-keygen -t rsa -b 4096 -f /home/pws/.ssh/id_rsa -q -N ""\' && ';
+            $cmd .= 'cp -f /home/pws/.ssh/id_rsa /home/pws/.ssh/authorized_keys && ';
+            $cmd .= 'chmod 600 /home/pws/.ssh/authorized_keys';
+            
             $cmd = $hcpp->do_action( 'cg_pws_regenerate_ssh_keys', $cmd );
             shell_exec( $cmd );
         }
