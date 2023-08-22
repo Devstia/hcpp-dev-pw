@@ -250,6 +250,14 @@ if ( ! class_exists( 'CG_PWS') ) {
             }
 
             // Always copy the ssh keys back to the appFolder/security/ssh on reboot
+            $this->copy_ssh_keys();
+        }
+
+        /**
+         * Copy back the ssh keys to the appFolder/security/ssh.
+         */
+        public function copy_ssh_keys() {
+            global $hcpp;
             $cmd = 'rm -rf /media/appFolder/security/ssh && mkdir -p /media/appFolder/security/ssh && ';
             $cmd .= 'cp /home/debian/.ssh/id_rsa /media/appFolder/security/ssh/debian_rsa && ';
             $cmd .= 'cp /home/debian/.ssh/id_rsa.pub /media/appFolder/security/ssh/debian_rsa.pub &&';
@@ -284,6 +292,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             
             $cmd = $hcpp->do_action( 'cg_pws_regenerate_ssh_keys', $cmd );
             shell_exec( $cmd );
+            $this->copy_ssh_keys();
         }
 
         /**
