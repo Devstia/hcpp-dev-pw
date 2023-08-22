@@ -281,7 +281,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd .= 'chown -R debian:debian /home/debian/.ssh && chmod -R 700 /home/debian/.ssh && ';
             $cmd .= 'runuser -l debian -c \'ssh-keygen -t rsa -b 4096 -f /home/debian/.ssh/id_rsa -q -N ""\' && ';
             $cmd .= 'cp -f /home/debian/.ssh/id_rsa.pub /home/debian/.ssh/authorized_keys && ';
-            $cmd .= 'chown debian:debian /home/pws/.ssh/authorized_keys && chmod 600 /home/debian/.ssh/authorized_keys && ';
+            $cmd .= 'chown debian:debian /home/debian/.ssh/authorized_keys && chmod 600 /home/debian/.ssh/authorized_keys && ';
 
             // pws
             $cmd .= 'rm -rf /home/pws/.ssh && mkdir -p /home/pws/.ssh && ';
