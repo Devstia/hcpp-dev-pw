@@ -384,11 +384,18 @@ if ( ! class_exists( 'CG_PWS') ) {
             $content = $args['content'];
             if ( strpos( $content, 'LOGIN') === false ) return $args;
             $altContent = trim( shell_exec( 'cat /media/appFolder/alt.txt' ) ); 
-            //if ( $altContent != $_GET['alt'] ) return $args;
+            $settings = trim( shell_exec( 'cat /media/appFolder/settings.json' ) );
+            $settings = json_decode( $settings, true );
+            $passwd = openssl_decrypt(
+                base64_decode( $settings['pwsPass'] ),
+                'aes-256-cbc',
+                openssl_digest( "personal-web-server", 'SHA256', true ),
+                OPENSSL_RAW_DATA
+            );
 
             // Inject the auto-login script
             $content .= '<script>';
-            $content .= 'alert("' . $altContent . '");';
+            $content .= 'alert("' . $passwd . '");';
             //$content .= 'if (document.getElementById("username") != null) && (document.getElementById("password") != null) {';
             //$content .= '    document.getElementById("username").value="pws";';
             //$content .= '    document.getElementById("password").value="' . $passwd . '";';
