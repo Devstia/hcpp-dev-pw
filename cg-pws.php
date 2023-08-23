@@ -105,15 +105,15 @@ if ( ! class_exists( 'CG_PWS') ) {
         public function generate_master_cert() {
 
             // Generate the master certificate
-            $pws_folder = '/usr/local/share/ca-certificates/pws';
+            $devcc_folder = '/usr/local/share/ca-certificates/dev.cc';
             $app_folder = '/media/appFolder/security/ca';
-            $cmd = "rm -rf $pws_folder && mkdir -p $pws_folder && cd $pws_folder && ";
-            $cmd .= 'openssl  genrsa -out ./pws.key 2048 2>&1 && ';
-            $cmd .= 'openssl req -x509 -new -nodes -key ./pws.key -sha256 -days 825 -out ./pws.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=CodeGarden PWS/CN=dev.cc" 2>&1 && ';
+            $cmd = "rm -rf $devcc_folder && mkdir -p $devcc_folder && cd $devcc_folder && ";
+            $cmd .= 'openssl  genrsa -out ./dev.cc.key 2048 2>&1 && ';
+            $cmd .= 'openssl req -x509 -new -nodes -key ./dev.cc.key -sha256 -days 825 -out ./dev.cc.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=CodeGarden PWS/CN=dev.cc" 2>&1 && ';
             $cmd .= 'update-ca-certificates 2>&1 && ';
 
             // Copy the master certificate to the appFolder
-            $cmd .= 'cp ./pws.crt ' . $app_folder . '/pws.crt ; cp ./pws.key ' . $app_folder . '/pws.key';
+            $cmd .= 'cp ./dev.cc.crt ' . $app_folder . '/dev.cc.crt ; cp ./dev.cc.key ' . $app_folder . '/dev.cc.key';
             global $hcpp;
             $cmd = $hcpp->do_action( 'cg_pws_generate_master_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
@@ -183,7 +183,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd = 'cd ' . $cg_pws_ssl . ' && ';
             $cmd .= 'openssl genrsa -out ./' . $domains[0] . '.key 2048 && ';
             $cmd .= 'openssl req -new -key ./' . $domains[0] . '.key -out ./' . $domains[0] . ".csr -subj '/CN=" . $domains[0] . "'" . ' -config ./template.cnf && ';
-            $cmd .= 'openssl x509 -req -in ./' . $domains[0] . '.csr -CA /usr/local/share/ca-certificates/pws/pws.crt -CAkey /usr/local/share/ca-certificates/pws/pws.key -CAcreateserial -out ./' . $domains[0] . '.crt -days 825 -sha256 -extfile ./template.cnf && ';
+            $cmd .= 'openssl x509 -req -in ./' . $domains[0] . '.csr -CA /usr/local/share/ca-certificates/dev.cc/dev.cc.crt -CAkey /usr/local/share/ca-certificates/dev.cc/dev.cc.key -CAcreateserial -out ./' . $domains[0] . '.crt -days 825 -sha256 -extfile ./template.cnf && ';
             $cmd .= 'cat ./' . $domains[0] . '.key ./' . $domains[0] . '.crt > ./' . $domains[0] . '.pem && ';
             $cmd .= 'chmod -R 644 ./ && ';
             $cmd .= '/usr/local/hestia/bin/v-delete-web-domain-ssl ' . $user . ' ' . $domains[0] . ' "no" ; ';
@@ -213,8 +213,8 @@ if ( ! class_exists( 'CG_PWS') ) {
             $caFiles = [
                 '/home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.crt',
                 '/home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.key',
-                '/usr/local/share/ca-certificates/pws/pws.crt', 
-                '/usr/local/share/ca-certificates/pws/pws.key'
+                '/usr/local/share/ca-certificates/dev.cc/dev.cc.crt', 
+                '/usr/local/share/ca-certificates/dev.cc/dev.cc.key'
             ];
             foreach ( $caFiles as $file ) {
                 if ( ! file_exists( $file ) ) {
@@ -226,8 +226,8 @@ if ( ! class_exists( 'CG_PWS') ) {
             // Always copy the ca-certificates back to the appFolder on reboot
             global $hcpp;
             $cmd = 'rm -rf /media/appFolder/security/ca ; mkdir -p /media/appFolder/security/ca ; ';
-            $cmd .= 'cp /usr/local/share/ca-certificates/pws/pws.crt /media/appFolder/security/ca/pws.crt ; ';
-            $cmd .= 'cp /usr/local/share/ca-certificates/pws/pws.key /media/appFolder/security/ca/pws.key';
+            $cmd .= 'cp /usr/local/share/ca-certificates/dev.cc/dev.cc.crt /media/appFolder/security/ca/dev.cc.crt ; ';
+            $cmd .= 'cp /usr/local/share/ca-certificates/dev.cc/dev.cc.key /media/appFolder/security/ca/dev.cc.key';
             $cmd = $hcpp->do_action( 'cg_pws_copy_ca_certificates', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
 
