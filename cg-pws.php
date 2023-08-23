@@ -24,6 +24,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'hcpp_csrf_verified', [ $this, 'hcpp_csrf_verified' ] );
             $hcpp->add_action( 'hcpp_render_body', [ $this, 'hcpp_render_body' ] );
             $hcpp->add_action( 'hcpp_rebooted', [ $this, 'hcpp_rebooted' ] );
+            $hcpp->add_action( 'hcpp_head', [ $this, 'hcpp_head' ] );
         }
 
         /**
@@ -373,7 +374,21 @@ if ( ! class_exists( 'CG_PWS') ) {
             }
             return $args;
         }
-       
+
+        /**
+         * Intercept login, check for valid auto-login token (alt), and automatically
+         * submit login form if valid.
+         */
+        public function hcpp_head( $args ) {
+            $content = $args['content'];
+            if ( strpos( $content, '<title>LOGIN - local.dev.cc - CodeGarden PWS</title>') === false ) return $args;
+            $content .= '<script>alert("login detected");</script>';
+            $args['content'] = $content;
+            global $hcpp;
+            $hcpp->log( "login detected" );
+            $hcpp->log( $_REQUEST );
+            return $args;
+        }
     }
     new CG_PWS(); 
 } 
