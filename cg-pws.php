@@ -380,13 +380,21 @@ if ( ! class_exists( 'CG_PWS') ) {
          * submit login form if valid.
          */
         public function hcpp_head( $args ) {
+            if ( !isset( $_GET['alt'] ) ) return $args;
             $content = $args['content'];
-            if ( strpos( $content, '<title>LOGIN - local.dev.cc - CodeGarden PWS</title>') === false ) return $args;
-            $content .= '<script>alert("login detected");</script>';
+            if ( strpos( $content, 'LOGIN') === false ) return $args;
+            $altContent = trim( shell_exec( 'cat /media/appFolder/alt.txt' ) ); 
+            //if ( $altContent != $_GET['alt'] ) return $args;
+
+            // Inject the auto-login script
+            $content .= '<script>';
+            $content .= 'alert("' . $altContent . '");';
+            //$content .= 'if (document.getElementById("username") != null) && (document.getElementById("password") != null) {';
+            //$content .= '    document.getElementById("username").value="pws";';
+            //$content .= '    document.getElementById("password").value="' . $passwd . '";';
+            //$content .= '}';
+            $content .= '</script>';
             $args['content'] = $content;
-            global $hcpp;
-            $hcpp->log( "login detected" );
-            $hcpp->log( $_REQUEST );
             return $args;
         }
     }
