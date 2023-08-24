@@ -395,7 +395,7 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // Inject the auto-login script
             $content .= '<script>';
-            $content .= 'if (document.getElementById("username") != null) && (document.getElementById("password") != null) {';
+            $content .= 'if (document.getElementById("username") != null && document.getElementById("password") != null) {';
             $content .= '    document.getElementById("username").value="pws";';
             $content .= '    document.getElementById("password").value="' . $passwd . '";';
             $content .= '    document.getElementsByTagName("button")[0].click();';
