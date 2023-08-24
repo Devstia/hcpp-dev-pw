@@ -401,7 +401,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $content .= '        document.getElementById("form_login").style.display = "none";';
             $content .= '        document.getElementById("username").value="pws";';
             $content .= '        document.getElementById("password").value="' . $passwd . '";';
-            $content .= '        document.getElementsByTagName("button")[0].click();';
+            $content .= '        setTimeout(function(){document.getElementsByTagName("button")[0].click();},1000);';
             $content .= '    }';
             $content .= '});';
             $content .= '</script>';
