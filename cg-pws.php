@@ -401,7 +401,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $content .= '        document.getElementById("password").value="' . $passwd . '";';
             $content .= '        document.getElementsByTagName("button")[0].click();';
             $content .= '    }';
-            $content .= '}';
+            $content .= '});';
             $content .= '</script>';
             $args['content'] = $content;
             return $args;
