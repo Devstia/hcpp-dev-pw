@@ -380,29 +380,44 @@ if ( ! class_exists( 'CG_PWS') ) {
          * submit login form if valid.
          */
         public function hcpp_head( $args ) {
+
+            // Check for valid auto-login token
             if ( !isset( $_GET['alt'] ) ) return $args;
             $content = $args['content'];
             if ( strpos( $content, 'LOGIN') === false ) return $args;
             $altContent = trim( shell_exec( 'cat /media/appFolder/alt.txt' ) ); 
+            if ( $_GET['alt'] != $altContent ) return $args;
+
+            // Get the password
             $settings = trim( shell_exec( 'cat /media/appFolder/settings.json' ) );
             $settings = json_decode( $settings, true );
-            $passwd = openssl_decrypt(
-                base64_decode( $settings['pwsPass'] ),
-                'aes-256-cbc',
-                openssl_digest( "personal-web-server", 'SHA256', true ),
-                OPENSSL_RAW_DATA
-            );
+            $passwd = $this->decrypt( $settings['pwdPass'] );
 
             // Inject the auto-login script
             $content .= '<script>';
-            $content .= 'alert("' . $passwd . '");';
-            //$content .= 'if (document.getElementById("username") != null) && (document.getElementById("password") != null) {';
-            //$content .= '    document.getElementById("username").value="pws";';
-            //$content .= '    document.getElementById("password").value="' . $passwd . '";';
-            //$content .= '}';
+            $content .= 'if (document.getElementById("username") != null) && (document.getElementById("password") != null) {';
+            $content .= '    document.getElementById("username").value="pws";';
+            $content .= '    document.getElementById("password").value="' . $passwd . '";';
+            $content .= '    document.getElementsByTagName("button")[0].click();';
+            $content .= '}';
             $content .= '</script>';
             $args['content'] = $content;
             return $args;
+        }
+
+        /**
+         * Decrypts data using aes-256-cbc algorithm
+         * 
+         * @param data string to be decrypted
+         * @returns string containing decrypted data
+         */
+        public function decrypt( $data ) {
+            $key = md5('personal-web-server');
+            $data = explode( ':', $data );
+            $encrypted_data = base64_decode( $data[0] );
+            $iv = base64_decode( $data[1] );
+            $decrypted = openssl_decrypt( $encrypted_data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv );
+            return $decrypted;
         }
     }
     new CG_PWS(); 
