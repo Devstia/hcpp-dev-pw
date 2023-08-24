@@ -1,0 +1,4 @@
+#!/bin/bash
+rm -f /home/admin/web/local.dev.cc/public_html/index.html
+cp -r /usr/local/hestia/plugins/cg-pws/public_html/* /home/admin/web/local.dev.cc/public_html/
+chown -f -R admin:admin /home/admin/web/local.dev.cc/public_html
