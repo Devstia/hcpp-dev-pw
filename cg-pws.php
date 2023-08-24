@@ -397,6 +397,8 @@ if ( ! class_exists( 'CG_PWS') ) {
             $content .= '<script>';
             $content .= 'document.addEventListener("DOMContentLoaded", function(event) {';
             $content .= '    if (document.getElementById("username") != null && document.getElementById("password") != null) {';
+            $content .= '        document.getElementsByClassName("login")[0].style.display = "none";';
+            $content .= '        document.getElementById("form_login").style.display = "none";';
             $content .= '        document.getElementById("username").value="pws";';
             $content .= '        document.getElementById("password").value="' . $passwd . '";';
             $content .= '        document.getElementsByTagName("button")[0].click();';
