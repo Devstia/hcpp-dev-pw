@@ -391,7 +391,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             // Get the password
             $settings = trim( shell_exec( 'cat /media/appFolder/settings.json' ) );
             $settings = json_decode( $settings, true );
-            $passwd = $this->decrypt( $settings['pwdPass'] );
+            $passwd = $this->decrypt( $settings['pwsPass'] );
 
             // Inject the auto-login script
             $content .= '<script>';
