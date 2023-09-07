@@ -72,6 +72,12 @@ if ( ! class_exists( 'CG_PWS') ) {
 
         // Generate certs on demand
         public function hcpp_invoke_plugin( $args ) {
+            if ( $args[0] == 'cg_pws_get_alt' ) {
+                echo shell_exec( 'cat /media/appFolder/alt.txt' );
+            }
+            if ( $args[0] == 'cg_pws_get_settings' ) {
+                echo shell_exec( 'cat /media/appFolder/settings.json' );
+            }
             if ( $args[0] == 'cg_pws_generate_master_cert' ) {
                 $this->generate_master_cert();
             }
@@ -385,11 +391,12 @@ if ( ! class_exists( 'CG_PWS') ) {
             if ( !isset( $_GET['alt'] ) ) return $args;
             $content = $args['content'];
             if ( strpos( $content, 'LOGIN') === false ) return $args;
-            $altContent = trim( shell_exec( 'cat /media/appFolder/alt.txt' ) ); 
+            global $hcpp;
+            $altContent = trim( $hcpp->run( 'invoke-plugin cg_pws_get_alt' ) );
             if ( $_GET['alt'] != $altContent ) return $args;
 
             // Get the password
-            $settings = trim( shell_exec( 'cat /media/appFolder/settings.json' ) );
+            $settings = trim( $hcpp->run( 'invoke-plugin cg_pws_get_settings' ) );
             $settings = json_decode( $settings, true );
             $passwd = $this->decrypt( $settings['pwsPass'] );
 
