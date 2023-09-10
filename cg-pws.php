@@ -386,6 +386,13 @@ if ( ! class_exists( 'CG_PWS') ) {
          * submit login form if valid.
          */
         public function hcpp_head( $args ) {
+            // // Show green as our active color when using dark theme
+            // if ( strpos( $args['content'], 'dark.min.css' ) !== false ) {
+            //     $css = "<style>.main-menu-item-link.active .main-menu-item-label {";
+            //     $css .= "color:#33b100}@media (min-width: 768px) {";
+            //     $css .= ".main-menu-item-link.active {border-bottom-color:#33b100}}</style>";
+            //     $args['content'] .= $css;
+            // }
 
             // Check for valid auto-login token
             if ( !isset( $_GET['alt'] ) ) return $args;
