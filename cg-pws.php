@@ -414,6 +414,11 @@ if ( ! class_exists( 'CG_PWS') ) {
             $content .= '        document.getElementById("username").value="pws";';
             $content .= '        document.getElementById("password").value="' . $passwd . '";';
             $content .= '        document.getElementsByTagName("button")[0].click();';
+            $content .= '        var loginMsg = document.createElement("div");';
+            $content .= '        var formLogin = document.getElementById("form_login");';
+            $content .= '        formLogin.style.display = "none";';
+            $content .= '        loginMsg.textContent = "Please wait. Automatically logging in...";';
+            $content .= '        formLogin.parentNode.insertBefore(loginMsg, formLogin.nextSibling);';
             $content .= '    }';
             $content .= '});';
             $content .= '</script>';
