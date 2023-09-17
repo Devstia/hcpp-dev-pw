@@ -22,9 +22,64 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'hcpp_invoke_plugin', [ $this, 'hcpp_invoke_plugin' ] );
             $hcpp->add_action( 'hcpp_new_domain_ready', [ $this, 'hcpp_new_domain_ready' ] );
             $hcpp->add_action( 'hcpp_csrf_verified', [ $this, 'hcpp_csrf_verified' ] );
+            $hcpp->add_action( 'hcpp_nginx_reload', [ $this, 'hcpp_nginx_reload' ] );
             $hcpp->add_action( 'hcpp_render_body', [ $this, 'hcpp_render_body' ] );
             $hcpp->add_action( 'hcpp_rebooted', [ $this, 'hcpp_rebooted' ] );
             $hcpp->add_action( 'hcpp_head', [ $this, 'hcpp_head' ] );
+        }
+
+        /**
+         * On reload of nginx, ensure we listen on 127.0.0.1 interface
+         */
+        public function hcpp_nginx_reload( $cmds ) {
+            
+            // Find all nginx.conf and nginx.ssl.conf files in pws account
+            $directory = '/home/pws/conf/web';
+            find_nginx_conf_files( $directory );
+            function find_nginx_conf_files( $directory ) {
+                $files = scandir( $directory );
+                foreach ( $files as $file ) {
+                    if ( $file === '.' || $file === '..' ) continue;
+                    $filePath = $directory . '/' . $file;                    
+                    if ( is_dir( $filePath ) ) {
+                        find_nginx_conf_files( $filePath );
+                    } elseif ( is_file( $filePath ) && ( basename( $file ) === 'nginx.conf' || basename( $file ) === 'nginx.ssl.conf' ) ) {
+                        $lines = file( $filePath );
+                        $found = false;
+                        foreach ( $lines as $line ) {
+                            if ( strpos( trim( $line ), 'listen' ) === 0 && strpos( $line, '127.0.0.1:') ) {
+                                $found = true;
+                                break;
+                            }
+                        }
+                        if ( ! $found ) {
+                            modify_nginx_conf_file( $filePath );
+                        }
+                    }
+                }
+            }
+            function modify_nginx_conf_file( $filePath ) {
+                global $hcpp;
+                $lines = file( $filePath );
+                $modifiedLines = [];
+                foreach ($lines as $line) {
+                    $modifiedLines[] = $line;
+                    if (strpos( trim( $line ), 'listen') === 0 && strpos( $line, ':') !== false) {
+
+                        // Find existing IP
+                        $ip = $hcpp->delLeftMost( $line, 'listen' );
+                        $ip = $hcpp->getLeftMost( $line, ':' );
+                        $ip = trim( $ip );
+                        
+                        // Duplicate the line with "127.0.0.1" replacing the IP address
+                        $modifiedLine = str_replace( $line, $ip, '127.0.0.1' );
+                        $modifiedLines[] = $modifiedLine;
+                        break;
+                    }
+                }
+                file_put_contents( $filePath, implode( '', $modifiedLines ) );
+                $hcpp->log( "Modified $filePath for listen 127.0.0.1" );
+            }
         }
 
         /**
