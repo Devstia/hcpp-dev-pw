@@ -31,7 +31,7 @@ if ( ! class_exists( 'CG_PWS') ) {
         /**
          * On reload of nginx, ensure we listen on 127.0.0.1 interface
          */
-        public function hcpp_nginx_reload( $cmds ) {
+        public function hcpp_nginx_reload( $cmd ) {
             
             // Find all nginx.conf and nginx.ssl.conf files in pws account
             $directory = '/home/pws/conf/web';
@@ -80,6 +80,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 file_put_contents( $filePath, implode( '', $modifiedLines ) );
                 $hcpp->log( "Modified $filePath for listen 127.0.0.1" );
             }
+            return $cmd;
         }
 
         /**
