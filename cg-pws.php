@@ -50,7 +50,6 @@ if ( ! class_exists( 'CG_PWS') ) {
                         // Duplicate the line with "127.0.0.1" replacing the IP address
                         $modifiedLine = str_replace( $ip, '127.0.0.1', $line );
                         $modifiedLines[] = $modifiedLine;
-                        break;
                     }
                 }
                 file_put_contents( $filePath, implode( '', $modifiedLines ) );
