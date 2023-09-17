@@ -42,12 +42,11 @@ if ( ! class_exists( 'CG_PWS') ) {
                     $modifiedLines[] = $line;
                     if (strpos( trim( $line ), 'listen') === 0 && strpos( $line, ':') !== false) {
 
-                        // Find existing IP
-                        $ip = $hcpp->delLeftMost( $line, 'listen' );
-                        $ip = $hcpp->getLeftMost( $line, ':' );
+                        // Duplicate the line and find existing IP
+                        $modifiedLine = $line;
+                        $ip = $hcpp->delLeftMost( $modifiedLine, 'listen' );
+                        $ip = $hcpp->getLeftMost( $modifiedLine, ':' );
                         $ip = trim( $ip );
-                        
-                        // Duplicate the line with "127.0.0.1" replacing the IP address
                         $modifiedLine = str_replace( $ip, '127.0.0.1', $line );
                         $modifiedLines[] = $modifiedLine;
                     }
@@ -66,12 +65,12 @@ if ( ! class_exists( 'CG_PWS') ) {
                         $lines = file( $filePath );
                         $found = false;
                         foreach ( $lines as $line ) {
-                            if ( strpos( trim( $line ), 'listen' ) === 0 && strpos( $line, '127.0.0.1:') ) {
+                            if ( strpos( trim( $line ), 'listen' ) === 0 && strpos( $line, '127.0.0.1:') !== false ) {
                                 $found = true;
                                 break;
                             }
                         }
-                        if ( ! $found ) {
+                        if ( false == $found ) {
                             modify_nginx_conf_file( $filePath );
                         }
                     }
