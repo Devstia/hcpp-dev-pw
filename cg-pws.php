@@ -43,9 +43,8 @@ if ( ! class_exists( 'CG_PWS') ) {
                     if (strpos( trim( $line ), 'listen') === 0 && strpos( $line, ':') !== false) {
 
                         // Duplicate the line and find existing IP
-                        $modifiedLine = $line;
-                        $ip = $hcpp->delLeftMost( $modifiedLine, 'listen' );
-                        $ip = $hcpp->getLeftMost( $modifiedLine, ':' );
+                        $ip = $hcpp->delLeftMost( $line, 'listen' );
+                        $ip = $hcpp->getLeftMost( $ip, ':' );
                         $ip = trim( $ip );
                         $modifiedLine = str_replace( $ip, '127.0.0.1', $line );
                         $modifiedLines[] = $modifiedLine;
