@@ -34,8 +34,28 @@ if ( ! class_exists( 'CG_PWS') ) {
         public function hcpp_nginx_reload( $cmd ) {
             
             // Find all nginx.conf and nginx.ssl.conf files in pws account
-            $directory = '/home/pws/conf/web';
-            find_nginx_conf_files( $directory );
+            function modify_nginx_conf_file( $filePath ) {
+                global $hcpp;
+                $lines = file( $filePath );
+                $modifiedLines = [];
+                foreach ($lines as $line) {
+                    $modifiedLines[] = $line;
+                    if (strpos( trim( $line ), 'listen') === 0 && strpos( $line, ':') !== false) {
+
+                        // Find existing IP
+                        $ip = $hcpp->delLeftMost( $line, 'listen' );
+                        $ip = $hcpp->getLeftMost( $line, ':' );
+                        $ip = trim( $ip );
+                        
+                        // Duplicate the line with "127.0.0.1" replacing the IP address
+                        $modifiedLine = str_replace( $ip, '127.0.0.1', $line );
+                        $modifiedLines[] = $modifiedLine;
+                        break;
+                    }
+                }
+                file_put_contents( $filePath, implode( '', $modifiedLines ) );
+                $hcpp->log( "Modified $filePath for listen 127.0.0.1" );
+            }
             function find_nginx_conf_files( $directory ) {
                 $files = scandir( $directory );
                 foreach ( $files as $file ) {
@@ -58,28 +78,8 @@ if ( ! class_exists( 'CG_PWS') ) {
                     }
                 }
             }
-            function modify_nginx_conf_file( $filePath ) {
-                global $hcpp;
-                $lines = file( $filePath );
-                $modifiedLines = [];
-                foreach ($lines as $line) {
-                    $modifiedLines[] = $line;
-                    if (strpos( trim( $line ), 'listen') === 0 && strpos( $line, ':') !== false) {
-
-                        // Find existing IP
-                        $ip = $hcpp->delLeftMost( $line, 'listen' );
-                        $ip = $hcpp->getLeftMost( $line, ':' );
-                        $ip = trim( $ip );
-                        
-                        // Duplicate the line with "127.0.0.1" replacing the IP address
-                        $modifiedLine = str_replace( $line, $ip, '127.0.0.1' );
-                        $modifiedLines[] = $modifiedLine;
-                        break;
-                    }
-                }
-                file_put_contents( $filePath, implode( '', $modifiedLines ) );
-                $hcpp->log( "Modified $filePath for listen 127.0.0.1" );
-            }
+            $directory = '/home/pws/conf/web';
+            find_nginx_conf_files( $directory );
             return $cmd;
         }
 
