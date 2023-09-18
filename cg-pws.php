@@ -368,20 +368,16 @@ if ( ! class_exists( 'CG_PWS') ) {
                 foreach ( $directory as $file ) {
                     if ( $file->isDir() && !$file->isDot() ) {
                         $domain = $file->getFilename();
-                        $cg_crt = "$path/$domain/cg_pws_ssl/$domain.crt";
-                        $ssl_crt = "$path/$domain/ssl/$domain.crt";
-                        if ( file_exists( $cg_crt ) && file_exists( $ssl_crt ) ) {
-                            $hcpp->log( 'Regenerating certificate for ' . $domain );
-                            $detail = $hcpp->run( "list-web-domain pws $domain json" );
-                            if ( $detail != NULL ) {
-                                $domains = $detail[$domain]['ALIAS'];
-                                $domains = explode(",", $domains);
-                                array_unshift( $domains, $domain );
-                            }else {
-                                $domains = array( $domain );
-                            }
-                            $this->generate_website_cert( 'pws', $domains );
+                        $hcpp->log( 'Regenerating certificate for ' . $domain );
+                        $detail = $hcpp->run( "list-web-domain pws $domain json" );
+                        if ( $detail != NULL ) {
+                            $domains = $detail[$domain]['ALIAS'];
+                            $domains = explode(",", $domains);
+                            array_unshift( $domains, $domain );
+                        }else {
+                            $domains = array( $domain );
                         }
+                        $this->generate_website_cert( 'pws', $domains );
                     }
                 }
             }
