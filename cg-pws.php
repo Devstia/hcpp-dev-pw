@@ -26,6 +26,53 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'hcpp_render_body', [ $this, 'hcpp_render_body' ] );
             $hcpp->add_action( 'hcpp_rebooted', [ $this, 'hcpp_rebooted' ] );
             $hcpp->add_action( 'hcpp_head', [ $this, 'hcpp_head' ] );
+            $hcpp->add_action( 'priv_update_sys_rrd', [ $this, 'priv_update_sys_rrd' ] );
+        }
+
+        /** 
+         * Check for notifications.
+         */
+        public function priv_update_sys_rrd( $args ) {
+            global $hcpp;
+            $jsonUrl = 'https://code.gdn/pws-notifications/index.php';
+            $contextOptions = [
+                'ssl' => [
+                    'verify_peer' => true,
+                    'verify_peer_name' => true,
+                ],
+            ];
+            sleep( mt_rand( 1, 8) ); // Stagger the requests
+            $context = stream_context_create($contextOptions);
+            $jsonData = file_get_contents($jsonUrl, false, $context);
+            if ($jsonData === false) {
+                $hcpp->log('Error: Failed to fetch notifications from ' . $jsonUrl);
+                return $args;
+            }
+            $pwsNoticeIndex = 0;
+            $pwsNoticeIndexFile = "/usr/local/hestia/data/hcpp/pws-notice-index.txt";
+            if ( file_exists( $pwsNoticeIndexFile ) ) {
+                $pwsNoticeIndex = (int)file_get_contents( $pwsNoticeIndexFile );
+            }
+            $messages = json_decode($jsonData, true);
+            foreach ($messages as $message) {
+                if ( (int)$message['id'] <= $pwsNoticeIndex ) continue;
+                $pwsNoticeIndex = (int)$message['id'];
+                file_put_contents( $pwsNoticeIndexFile, $pwsNoticeIndex );
+                $title = $this->sanitizeMessage( $message['title'] );
+                $message = $this->sanitizeMessage( $message['message'] );
+                $hcpp->run( 'add-user-notification pws "' . $title . '" "' . $message . '"' );
+            }
+            return $args;
+        }
+
+        /**
+         * Sanitize a message string for use in the shell command.
+         */
+        function sanitizeMessage( $message ) {
+            $message = str_replace( ["\n", "\r", "\t"], '', $message );
+            $message = preg_replace('/\r/', '', $message );
+            $message = escapeshellarg( html_entity_decode( $message ) );
+            return $message;
         }
 
         /**
