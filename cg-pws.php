@@ -69,6 +69,7 @@ if ( ! class_exists( 'CG_PWS') ) {
          * Sanitize a message string for use in the shell command.
          */
         function sanitizeMessage( $message ) {
+            $message = trim( $message );
             $message = str_replace( ["\n", "\r", "\t"], '', $message );
             $message = preg_replace('/\r/', '', $message );
             $message = escapeshellarg( html_entity_decode( $message ) );
