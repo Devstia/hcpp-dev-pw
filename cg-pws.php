@@ -399,10 +399,10 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // pws
             $cmd .= 'rm -rf /home/pws/.ssh && mkdir -p /home/pws/.ssh && ';
-            $cmd .= 'chown -R pws:pws /home/pws/.ssh && chmod -R 700 /home/pws/.ssh && ';
+            $cmd .= 'chown -R pws:pws /home/pws/.ssh && chmod -R 755 /home/pws/.ssh && ';
             $cmd .= 'runuser -l pws -c \'ssh-keygen -t rsa -b 4096 -f /home/pws/.ssh/id_rsa -q -N ""\' && ';
             $cmd .= 'cp -f /home/pws/.ssh/id_rsa.pub /home/pws/.ssh/authorized_keys && ';
-            $cmd .= 'chown pws:pws /home/pws/.ssh/authorized_keys && chmod 600 /home/pws/.ssh/authorized_keys';
+            $cmd .= 'chown pws:pws /home/pws/.ssh/authorized_keys && chmod 644 /home/pws/.ssh/authorized_keys';
             
             $cmd = $hcpp->do_action( 'cg_pws_regenerate_ssh_keys', $cmd );
             shell_exec( $cmd );
