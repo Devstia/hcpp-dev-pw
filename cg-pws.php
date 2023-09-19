@@ -60,7 +60,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 file_put_contents( $pwsNoticeIndexFile, $pwsNoticeIndex );
                 $title = $this->sanitizeMessage( $message['title'] );
                 $message = $this->sanitizeMessage( $message['message'] );
-                $hcpp->run( 'add-user-notification pws "' . $title . '" "' . $message . '"' );
+                $hcpp->run( 'add-user-notification pws ' . $title . ' ' . $message);
             }
             return $args;
         }
