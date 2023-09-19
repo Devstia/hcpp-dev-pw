@@ -30,9 +30,9 @@ if ( ! class_exists( 'CG_PWS') ) {
         }
 
         /** 
-         * Check for notifications.
+         * Check for notifications on reboot and every 5 minutes.
          */
-        public function priv_update_sys_rrd( $args ) {
+        public function check_for_pws_notifications() {
             global $hcpp;
             $jsonUrl = 'https://code.gdn/pws-notifications/index.php';
             $contextOptions = [
@@ -46,7 +46,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $jsonData = file_get_contents($jsonUrl, false, $context);
             if ($jsonData === false) {
                 $hcpp->log('Error: Failed to fetch notifications from ' . $jsonUrl);
-                return $args;
+                return;
             }
             $pwsNoticeIndex = 0;
             $pwsNoticeIndexFile = "/usr/local/hestia/data/hcpp/pws-notice-index.txt";
@@ -62,9 +62,12 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $message = $this->sanitizeMessage( $message['message'] );
                 $hcpp->run( 'add-user-notification pws ' . $title . ' ' . $message);
             }
+        }
+        public function priv_update_sys_rrd( $args ) {
+            $this->check_for_pws_notifications();
             return $args;
         }
-
+        
         /**
          * Sanitize a message string for use in the shell command.
          */
@@ -359,6 +362,9 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // Always copy the ssh keys back to the appFolder/security/ssh on reboot
             $this->copy_ssh_keys();
+
+            // Check for notifications on reboot
+            $this->check_for_pws_notifications();
         }
 
         /**
