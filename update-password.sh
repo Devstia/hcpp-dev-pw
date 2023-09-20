@@ -17,7 +17,7 @@ echo "debian:$passwd" | chpasswd
 php -r 'require "/usr/local/hestia/web/pluginable.php"; $hcpp->do_action("cg_pws_update_password", "'"$passwd"'");'
 
 ## Create/update pws permissions for MySQL/phpMyAdmin
-echo "DROP USER 'pws'@'localhost';" | mysql
 echo "REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'pws'@'localhost';" | mysql
+echo "DROP USER 'pws'@'localhost';" | mysql
 echo "CREATE USER 'pws'@'localhost' IDENTIFIED BY '$passwd';" | mysql
 echo "GRANT ALL ON \`pws\_%\`.* TO pws@localhost;" | mysql
