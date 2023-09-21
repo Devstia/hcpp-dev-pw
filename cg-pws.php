@@ -27,7 +27,19 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'hcpp_rebooted', [ $this, 'hcpp_rebooted' ] );
             $hcpp->add_action( 'hcpp_head', [ $this, 'hcpp_head' ] );
             $hcpp->add_action( 'priv_update_sys_rrd', [ $this, 'priv_update_sys_rrd' ] );
+            $hcpp->add_action( 'priv_log_user_logout', [ $this, 'priv_log_user_logout' ] );
         }
+
+        /**
+         * Remove phpMyAdmin SSO token on logout.
+         */
+         public function priv_log_user_logout( $args ) {
+            $pma_token_file = '/tmp/pma_token.txt';
+            $pma_pwspass = '/tmp/pma_pwspass.txt';
+            unlink( $pma_token_file );
+            unlink( $pma_pwspass );
+            return $args;
+         }
 
         /** 
          * Check for notifications on reboot and every 5 minutes.
@@ -198,6 +210,44 @@ if ( ! class_exists( 'CG_PWS') ) {
             }
             if ( $args[0] == 'cg_pws_regenerate_ssh_keys' ) {
                 $this->regenerate_ssh_keys();
+            }
+            if ( $args[0] == 'cg_pws_pma_sso' ) {
+
+                // Renew or expire the token file
+                global $hcpp;
+                $pma_token_file = '/tmp/pma_token.txt';
+                $pma_token = '';
+                if ( file_exists( $pma_token_file ) ) {
+                    if ( time() - filemtime( $pma_token_file ) > 1800 ) { // 15 minutes
+                        unlink( $pma_token_file );
+                    }else{
+                        touch( $pma_token_file );
+                        $pma_token = file_get_contents( $pma_token_file );
+                    }
+                }
+
+                // Generate a new token if needed
+                if ( $pma_token == '' ) {
+                    $pma_token = $hcpp->nodeapp->random_chars( 16 );
+                    file_put_contents( $pma_token_file, $pma_token );
+                    chmod( $pma_token_file, 0700 );
+                    chown( $pma_token_file, 'www-data' );
+                    chgrp( $pma_token_file, 'www-data' );
+                }
+
+                // Get the pws password
+                $settings = trim( shell_exec( 'cat /media/appFolder/settings.json' ) );
+                $settings = json_decode( $settings, true );
+                $passwd = $this->decrypt( $settings['pwsPass'] );
+
+                // Re-encrypt it using the pma_token as the key
+                $passwd = $this->encrypt( $passwd, $pma_token );
+                $pma_pwspass = '/tmp/pma_pwspass.txt';
+                file_put_contents( $pma_pwspass, $passwd );
+                chmod( $pma_pwspass, 0700 );
+                chown( $pma_pwspass, 'www-data' );
+                chgrp( $pma_pwspass, 'www-data' );
+                echo $pma_token;
             }
             return $args;
         }
@@ -441,12 +491,12 @@ if ( ! class_exists( 'CG_PWS') ) {
         }
 
         /**
-         * Intercept web edit save, ensure ssl crt/key are not empty; suppresing
-         * the empty error message as we'll generate a certificate on the fly.
-         * 
-         * White label list_services page
+         * Customize our control panel pages. White label, restore convenience
+         * features etc.
          */
         public function hcpp_render_body( $args ) {
+            // Intercept web edit save, ensure ssl crt/key are not empty; suppressing
+            //* the empty error message as we'll generate a certificate on the fly.
             if ( $args['page'] == 'edit_web' ) {
                 $code = '<script>
                 // Get references to the necessary elements
@@ -476,9 +526,44 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $content = str_replace( '</form>', '</form>' . $code, $content );
                 $args['content'] = $content;
             }
+
+            // White label anything leftover that says Hestia Control Panel that
+            // HestiaCP failed to white label.
             if ( $args['page'] == 'list_services' ) {
                 $content = $args['content'];
                 $content = str_replace( 'Hestia Control Panel', 'CodeGarden PWS', $content );
+                $args['content'] = $content;
+            }
+
+            // Furnish enhanced phpMyAdmin SSO functionality in our localhost environment
+            if ( $args['page'] == 'list_db' ) {
+                global $hcpp;
+                $content = $args['content'];
+                $parse = '';
+
+                $pma_token = $hcpp->run( 'invoke-plugin cg_pws_pma_sso' );                
+                while( false !== strpos( $content, '//local.dev.cc/phpmyadmin/' ) ) {
+
+                    // Find each phpMyAdmin URL
+                    $parse .= $hcpp->getLeftMost( $content, '//local.dev.cc/phpmyadmin/' );
+                    $content = $hcpp->delLeftMost( $content, '//local.dev.cc/phpmyadmin/' );
+
+                    // Find the database name
+                    $remaining = $hcpp->getLeftMost( $content, '"' );
+                    $content = $hcpp->delLeftMost( $content, '"' );
+                    $db = '';
+                    if ( false !== strpos( $remaining, 'database=' ) ) {
+                        $db = $hcpp->delLeftMost( $remaining, 'database=' );
+                        $db = $hcpp->getLeftMost( $db, '&' );
+                        $db = '&db=' . $db;
+                    }
+
+                    // Replace the phpMyAdmin URL with our version that includes our token and db
+                    $parse .= '//local.dev.cc/phpmyadmin/?pma_token=' . $pma_token . $db .'"';
+                }
+                if ( $parse != '' ) {
+                    $content = $parse . $content;
+                }
                 $args['content'] = $content;
             }
             return $args;
@@ -505,7 +590,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $altContent = trim( $hcpp->run( 'invoke-plugin cg_pws_get_alt' ) );
             if ( $_GET['alt'] != $altContent ) return $args;
 
-            // Get the password
+            // Get the pws password
             $settings = trim( $hcpp->run( 'invoke-plugin cg_pws_get_settings' ) );
             $settings = json_decode( $settings, true );
             $passwd = $this->decrypt( $settings['pwsPass'] );
@@ -533,16 +618,36 @@ if ( ! class_exists( 'CG_PWS') ) {
          * Decrypts data using aes-256-cbc algorithm
          * 
          * @param data string to be decrypted
+         * @param key string optional value to be used as key
          * @returns string containing decrypted data
          */
-        public function decrypt( $data ) {
-            $key = md5('personal-web-server');
+        public function decrypt( $data, $key = 'personal-web-server' ) {
+            $key = md5( $key );
             $data = explode( ':', $data );
             $encrypted_data = base64_decode( $data[0] );
             $iv = base64_decode( $data[1] );
             $decrypted = openssl_decrypt( $encrypted_data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv );
             return $decrypted;
         }
+
+        /**
+         * Encrypts data using aes-256-cbc algorithm
+         * 
+         * @param data string to be encrypted
+         * @param key string optional value to be used as key
+         * @returns string containing decrypted data
+         */
+        public function encrypt( $data, $key = 'personal-web-server' ) {
+            $key = md5( $key );
+            $iv = openssl_random_pseudo_bytes(16); // Generate a random IV
+        
+            $encrypted_data = openssl_encrypt($data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+            $encoded_encrypted_data = base64_encode($encrypted_data);
+            $encoded_iv = base64_encode($iv);
+        
+            return $encoded_encrypted_data . ':' . $encoded_iv;
+        }
+        
     }
     new CG_PWS(); 
 } 

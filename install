@@ -4,6 +4,9 @@
 /usr/local/hestia/bin/v-change-sys-config-value LOGIN_STYLE old
 cp -r /usr/local/hestia/plugins/cg-pws/images/* /usr/local/hestia/web/images/
 
+# Advanced phpMyAdmin SSO
+cp /usr/local/hestia/plugins/cg-pws/cg-pws-sso.php /etc/phpmyadmin/conf.d/cg-pws-sso.php
+
 # Update localhost web domain
 ./update
 
