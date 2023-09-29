@@ -40,7 +40,9 @@ if ( ! class_exists( 'CG_PWS') ) {
               $script = '<script>
                 $("#main-form").submit(function(event) {
                   console.log("submitting");
-                  $(".spinner-overlay").addClass("active");
+                  setTimeout(function() {
+                    $(".spinner-overlay").addClass("active");
+                  }, 300);
                 });
               </script>';
               $content = $args['content'];
