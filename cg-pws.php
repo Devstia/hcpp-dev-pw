@@ -39,11 +39,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             if (in_array($args['page'], ['add_web', 'edit_web', 'setup_webapp'])) {
               $script = '<script>
                 $("#main-form").submit(function(event) {
-                  event.preventDefault();
                   $(".spinner-overlay").addClass("active");
-                  setTimeout(function() {
-                    $("#main-form").off("submit").submit();
-                  }, 500);
                 });
               </script>';
               $content = $args['content'];
