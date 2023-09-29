@@ -29,27 +29,6 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'priv_update_sys_rrd', [ $this, 'priv_update_sys_rrd' ] );
             $hcpp->add_action( 'priv_log_user_logout', [ $this, 'priv_log_user_logout' ] );
             $hcpp->add_action( 'hccp_update_core_cmd', [ $this, 'hccp_update_core_cmd' ] );
-            $hcpp->add_action( 'hcpp_render_footer', [ $this, 'hcpp_render_footer' ] );
-        }
-
-        /**
-         * Ensure spinner is shown on form submissions
-         */
-        public function hcpp_render_footer( $args ) {
-            if (in_array($args['page'], ['add_web', 'edit_web', 'setup_webapp'])) {
-              $script = '<script>
-                $("#main-form").submit(function(event) {
-                  console.log("submitting");
-                  setTimeout(function() {
-                    $(".spinner-overlay").addClass("active");
-                  }, 300);
-                });
-              </script>';
-              $content = $args['content'];
-              $content = str_replace( '</body>', $script . '</body>', $content );
-              $args['content'] = $content;
-            }
-            return $args;
         }
 
         /**
