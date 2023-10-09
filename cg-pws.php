@@ -424,6 +424,14 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // Check for notifications on reboot
             $this->check_for_pws_notifications();
+
+            // Start apache2 if it's not running, addresses service issue with VM
+            $cmd = 'service apache2 status';
+            $status = shell_exec( $cmd );
+            if ( strpos( $status, 'Active: active' ) === false ) {
+                $cmd = 'service apache2 start';
+                shell_exec( $cmd );
+            }
         }
 
         /**
