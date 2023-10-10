@@ -425,13 +425,15 @@ if ( ! class_exists( 'CG_PWS') ) {
             // Check for notifications on reboot
             $this->check_for_pws_notifications();
 
-            // Start apache2 if it's not running, addresses service issue with VM
-            $cmd = 'service apache2 status';
-            $status = shell_exec( $cmd );
-            if ( strpos( $status, 'Active: active' ) === false ) {
-                $cmd = 'service apache2 start';
-                shell_exec( $cmd );
+            // Kickstart kludge to ensure apache2 and nginx startup on reboot
+            $cmd = '';
+            if ( strpos( shell_exec( 'service apache2 status' ), 'Active: active' ) === false ) {
+                $cmd .= 'service apache2 start';
             }
+            if ( strpos( shell_exec( 'service nginx status' ), 'Active: active' ) === false ) {
+                $cmd .= 'service nginx start';
+            }
+            if ( $cmd != '' ) shell_exec( $cmd );
         }
 
         /**
