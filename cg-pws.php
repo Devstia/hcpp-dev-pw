@@ -18,7 +18,7 @@ if ( ! class_exists( 'CG_PWS') ) {
         public function __construct() {
             global $hcpp;
             $hcpp->cg_pws = $this;
-            $hcpp->add_action( 'hccp_update_core_cmd', [ $this, 'hccp_update_core_cmd' ] );
+            $hcpp->add_action( 'hcpp_update_core_cmd', [ $this, 'hcpp_update_core_cmd' ] );
             $hcpp->add_action( 'hcpp_invoke_plugin', [ $this, 'hcpp_invoke_plugin' ] );
             $hcpp->add_action( 'hcpp_new_domain_ready', [ $this, 'hcpp_new_domain_ready' ] );
             $hcpp->add_action( 'hcpp_csrf_verified', [ $this, 'hcpp_csrf_verified' ] );
@@ -28,13 +28,11 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'hcpp_head', [ $this, 'hcpp_head' ] );
             $hcpp->add_action( 'priv_update_sys_rrd', [ $this, 'priv_update_sys_rrd' ] );
             $hcpp->add_action( 'priv_log_user_logout', [ $this, 'priv_log_user_logout' ] );
-            $hcpp->add_action( 'hccp_update_core_cmd', [ $this, 'hccp_update_core_cmd' ] );
         }
-
         /**
          * Re-apply white label, pma sso, on core update.
          */
-        public function hccp_update_core_cmd( $cmd ) {
+        public function hcpp_update_core_cmd( $cmd ) {
             $cmd = 'cd /usr/local/hestia/plugins/cg-pws && ./install && ' . $cmd;
             return $cmd;
         }
@@ -259,12 +257,6 @@ if ( ! class_exists( 'CG_PWS') ) {
                 echo $pma_token;
             }
             return $args;
-        }
-
-        // Re-apply installation after core udpate
-        public function hcpp_update_core_cmd( $cmd ) {
-            $cmd = 'cd /usr/local/hestia/plugins/cg-pws && ./install && ' . $cmd;
-            return $cmd;
         }
 
         /**
