@@ -595,7 +595,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $content = $args['content'];
             if ( strpos( $content, 'LOGIN') === false ) return $args;
             global $hcpp;
-            $altContent = trim( $hcpp->run( 'cd /tmp && wget -O alt.txt http://pws:personal-web-server@10.0.2.2:8088/appFolder/alt.txt && cat alt.txt && rm alt.txt' ) );
+            $altContent = trim( $hcpp->run( 'curl -u pws:personal-web-server http://10.0.2.2:8088/appFolder/alt.txt' ) );
             if ( $_GET['alt'] != $altContent ) return $args;
 
             // Get the pws password
