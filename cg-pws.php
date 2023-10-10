@@ -195,9 +195,6 @@ if ( ! class_exists( 'CG_PWS') ) {
 
         // Generate certs on demand
         public function hcpp_invoke_plugin( $args ) {
-            if ( $args[0] == 'cg_pws_get_alt' ) {
-                echo shell_exec( 'cat /media/appFolder/alt.txt' );
-            }
             if ( $args[0] == 'cg_pws_get_settings' ) {
                 echo shell_exec( 'cat /media/appFolder/settings.json' );
             }
@@ -598,7 +595,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $content = $args['content'];
             if ( strpos( $content, 'LOGIN') === false ) return $args;
             global $hcpp;
-            $altContent = trim( $hcpp->run( 'invoke-plugin cg_pws_get_alt' ) );
+            $altContent = trim( $hcpp->run( 'cd /tmp && wget -O alt.txt http://pws:personal-web-server@10.0.2.2:8088/appFolder/alt.txt && cat alt.txt && rm alt.txt' ) );
             if ( $_GET['alt'] != $altContent ) return $args;
 
             // Get the pws password
