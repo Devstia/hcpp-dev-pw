@@ -28,7 +28,17 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'hcpp_head', [ $this, 'hcpp_head' ] );
             $hcpp->add_action( 'priv_update_sys_rrd', [ $this, 'priv_update_sys_rrd' ] );
             $hcpp->add_action( 'priv_log_user_logout', [ $this, 'priv_log_user_logout' ] );
+            $hcpp->add_action( 'cg_pws_update_password', [ $this, 'cg_pws_update_password' ] );
         }
+
+        /**
+         * Update encrypted password for the pws user.
+         */
+        public function cg_pws_update_password( $passwd ) {
+            $passwd = $this->encrypt( $passwd );
+            file_put_contents( '/home/admin/.pwsPass', $passwd );
+        }
+
         /**
          * Re-apply white label, pma sso, on core update.
          */
@@ -47,6 +57,32 @@ if ( ! class_exists( 'CG_PWS') ) {
             unlink( $pma_pwspass );
             return $args;
          }
+
+        /**
+         * Publish certificates and keys to the cg-pws app server.
+         */
+        public function publish_certs_keys() {
+            $data = array(
+                'ca/dev.cc.crt' => file_get_contents( '/usr/local/share/ca-certificates/dev.cc/dev.cc.crt' ),
+                'ca/dev.cc.key' => file_get_contents( '/usr/local/share/ca-certificates/dev.cc/dev.cc.key' ),
+                'ssh/debian_rsa' => file_get_contents( '/home/debian/.ssh/id_rsa' ),
+                'ssh/debian_rsa.pub' => file_get_contents( '/home/debian/.ssh/id_rsa.pub' ),
+                'ssh/pws_rsa' => file_get_contents( '/home/pws/.ssh/id_rsa' ),
+                'ssh/pws_rsa.pub' => file_get_contents( '/home/pws/.ssh/id_rsa.pub' ),
+                'ssh/ssh_host_ecdsa_key.pub' => file_get_contents( '/etc/ssh/ssh_host_ecdsa_key.pub' ),
+                'ssh/ssh_host_rsa_key.pub' => file_get_contents( '/etc/ssh/ssh_host_rsa_key.pub' )
+            );
+            $options = array(
+                'http' => array(
+                    'method' => 'POST',
+                    'header' => 'Content-Type: application/json',
+                    'content' => json_encode($data)
+                )
+            );
+            $context = stream_context_create($options);
+            global $hcpp;
+            $hcpp->log( file_get_contents( 'http://10.0.2.2:8088/', false, $context) );
+        }
 
         /** 
          * Check for notifications on reboot and every 5 minutes.
@@ -195,8 +231,8 @@ if ( ! class_exists( 'CG_PWS') ) {
 
         // Generate certs on demand
         public function hcpp_invoke_plugin( $args ) {
-            if ( $args[0] == 'cg_pws_get_settings' ) {
-                echo shell_exec( 'cat /media/appFolder/settings.json' );
+            if ( $args[0] == 'cg_pws_pass' ) {
+                echo shell_exec( 'cat /home/admin/.pwsPass' );
             }
             if ( $args[0] == 'cg_pws_generate_master_cert' ) {
                 $this->generate_master_cert();
@@ -240,9 +276,8 @@ if ( ! class_exists( 'CG_PWS') ) {
                 }
 
                 // Get the pws password
-                $settings = trim( shell_exec( 'cat /media/appFolder/settings.json' ) );
-                $settings = json_decode( $settings, true );
-                $passwd = $this->decrypt( $settings['pwsPass'] );
+                $passwd = trim( shell_exec( 'cat /home/admin/.pwsPass' ) );
+                $passwd = $this->decrypt( $passwd );
 
                 // Re-encrypt it using the pma_token as the key
                 $passwd = $this->encrypt( $passwd, $pma_token );
@@ -264,18 +299,15 @@ if ( ! class_exists( 'CG_PWS') ) {
         public function generate_master_cert() {
 
             // Generate the master certificate
+            global $hcpp;
             $devcc_folder = '/usr/local/share/ca-certificates/dev.cc';
-            $app_folder = '/media/appFolder/security/ca';
             $cmd = "rm -rf $devcc_folder && mkdir -p $devcc_folder && cd $devcc_folder && ";
             $cmd .= 'openssl  genrsa -out ./dev.cc.key 2048 2>&1 && ';
             $cmd .= 'openssl req -x509 -new -nodes -key ./dev.cc.key -sha256 -days 825 -out ./dev.cc.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=CodeGarden PWS/CN=dev.cc" 2>&1 && ';
             $cmd .= 'update-ca-certificates 2>&1 && ';
-
-            // Copy the master certificate to the appFolder
-            $cmd .= 'cp ./dev.cc.crt ' . $app_folder . '/dev.cc.crt ; cp ./dev.cc.key ' . $app_folder . '/dev.cc.key';
-            global $hcpp;
             $cmd = $hcpp->do_action( 'cg_pws_generate_master_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
+            $this->publish_certs_keys();
 
             // Generate local.dev.cc for the control panel itself
             $hcpp->log( "Generating local.dev.cc certificate" );
@@ -382,24 +414,12 @@ if ( ! class_exists( 'CG_PWS') ) {
                 }
             }
 
-            // Always copy the ca-certificates back to the appFolder on reboot
-            global $hcpp;
-            $cmd = 'rm -rf /media/appFolder/security/ca ; mkdir -p /media/appFolder/security/ca ; ';
-            $cmd .= 'cp /usr/local/share/ca-certificates/dev.cc/dev.cc.crt /media/appFolder/security/ca/dev.cc.crt ; ';
-            $cmd .= 'cp /usr/local/share/ca-certificates/dev.cc/dev.cc.key /media/appFolder/security/ca/dev.cc.key';
-            $cmd = $hcpp->do_action( 'cg_pws_copy_ca_certificates', $cmd );
-            $hcpp->log( shell_exec( $cmd ) );
-
             // Generate ssh keypair for pws, debian
             $sshFiles = [
                 '/home/pws/.ssh/id_rsa',
                 '/home/pws/.ssh/id_rsa.pub',
                 '/home/debian/.ssh/id_rsa',
-                '/home/debian/.ssh/id_rsa.pub',
-                '/media/appFolder/security/ssh/debian_rsa',
-                '/media/appFolder/security/ssh/debian_rsa.pub',
-                '/media/appFolder/security/ssh/pws_rsa',
-                '/media/appFolder/security/ssh/pws_rsa.pub'
+                '/home/debian/.ssh/id_rsa.pub'
             ];
             foreach ( $sshFiles as $file ) {
                 if ( ! file_exists( $file ) ) {
@@ -408,11 +428,8 @@ if ( ! class_exists( 'CG_PWS') ) {
                 }
             }
 
-            // Always copy the ssh keys back to the appFolder/security/ssh on reboot
-            $this->copy_ssh_keys();
-
-            // Check for notifications on reboot
-            $this->check_for_pws_notifications();
+            // Always copy certs and keys back to the cg-pws app server on reboot
+            $this->publish_certs_keys();
 
             // Kickstart kludge to ensure apache2 and nginx startup on reboot
             $cmd = '';
@@ -423,22 +440,9 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $cmd .= 'service nginx start';
             }
             if ( $cmd != '' ) shell_exec( $cmd );
-        }
 
-        /**
-         * Copy back the ssh keys to the appFolder/security/ssh.
-         */
-        public function copy_ssh_keys() {
-            global $hcpp;
-            $cmd = 'rm -rf /media/appFolder/security/ssh && mkdir -p /media/appFolder/security/ssh && ';
-            $cmd .= 'cp /home/debian/.ssh/id_rsa /media/appFolder/security/ssh/debian_rsa && ';
-            $cmd .= 'cp /home/debian/.ssh/id_rsa.pub /media/appFolder/security/ssh/debian_rsa.pub &&';
-            $cmd .= 'cp /home/pws/.ssh/id_rsa /media/appFolder/security/ssh/pws_rsa && ';
-            $cmd .= 'cp /home/pws/.ssh/id_rsa.pub /media/appFolder/security/ssh/pws_rsa.pub && ';
-            $cmd .= 'cp /etc/ssh/ssh_host_ecdsa_key.pub /media/appFolder/security/ssh/ssh_host_ecdsa_key.pub && ';
-            $cmd .= 'cp /etc/ssh/ssh_host_rsa_key.pub /media/appFolder/security/ssh/ssh_host_rsa_key.pub';
-            $cmd = $hcpp->do_action( 'cg_pws_copy_ssh_keys', $cmd );
-            $hcpp->log( shell_exec( $cmd ) );
+            // Check for notifications on reboot
+            $this->check_for_pws_notifications();
         }
 
         /**
@@ -464,7 +468,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             
             $cmd = $hcpp->do_action( 'cg_pws_regenerate_ssh_keys', $cmd );
             shell_exec( $cmd );
-            $this->copy_ssh_keys();
+            $this->publish_certs_keys();
         }
 
         /**
@@ -595,13 +599,12 @@ if ( ! class_exists( 'CG_PWS') ) {
             $content = $args['content'];
             if ( strpos( $content, 'LOGIN') === false ) return $args;
             global $hcpp;
-            $altContent = trim( $hcpp->run( 'curl -u pws:personal-web-server http://10.0.2.2:8088/appFolder/alt.txt' ) );
+            $altContent = trim( $hcpp->run( 'cat /tmp/alt.txt' ) );
             if ( $_GET['alt'] != $altContent ) return $args;
 
             // Get the pws password
-            $settings = trim( $hcpp->run( 'invoke-plugin cg_pws_get_settings' ) );
-            $settings = json_decode( $settings, true );
-            $passwd = $this->decrypt( $settings['pwsPass'] );
+            $passwd = trim( $hcpp->run( 'invoke-plugin cg_pws_pass' ) );
+            $passwd = $this->decrypt( $passwd );
 
             // Inject the auto-login script
             $content .= '<script>';
