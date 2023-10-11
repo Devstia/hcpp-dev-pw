@@ -62,26 +62,30 @@ if ( ! class_exists( 'CG_PWS') ) {
          * Publish certificates and keys to the cg-pws app server.
          */
         public function publish_certs_keys() {
-            $data = array(
-                'ca/dev.cc.crt' => file_get_contents( '/usr/local/share/ca-certificates/dev.cc/dev.cc.crt' ),
-                'ca/dev.cc.key' => file_get_contents( '/usr/local/share/ca-certificates/dev.cc/dev.cc.key' ),
-                'ssh/debian_rsa' => file_get_contents( '/home/debian/.ssh/id_rsa' ),
-                'ssh/debian_rsa.pub' => file_get_contents( '/home/debian/.ssh/id_rsa.pub' ),
-                'ssh/pws_rsa' => file_get_contents( '/home/pws/.ssh/id_rsa' ),
-                'ssh/pws_rsa.pub' => file_get_contents( '/home/pws/.ssh/id_rsa.pub' ),
-                'ssh/ssh_host_ecdsa_key.pub' => file_get_contents( '/etc/ssh/ssh_host_ecdsa_key.pub' ),
-                'ssh/ssh_host_rsa_key.pub' => file_get_contents( '/etc/ssh/ssh_host_rsa_key.pub' )
-            );
-            $options = array(
-                'http' => array(
-                    'method' => 'POST',
-                    'header' => 'Content-Type: application/json',
-                    'content' => json_encode($data)
-                )
-            );
-            $context = stream_context_create($options);
             global $hcpp;
-            $hcpp->log( file_get_contents( 'http://10.0.2.2:8088/', false, $context) );
+            try {
+                $data = array(
+                    'ca/dev.cc.crt' => file_get_contents( '/usr/local/share/ca-certificates/dev.cc/dev.cc.crt' ),
+                    'ca/dev.cc.key' => file_get_contents( '/usr/local/share/ca-certificates/dev.cc/dev.cc.key' ),
+                    'ssh/debian_rsa' => file_get_contents( '/home/debian/.ssh/id_rsa' ),
+                    'ssh/debian_rsa.pub' => file_get_contents( '/home/debian/.ssh/id_rsa.pub' ),
+                    'ssh/pws_rsa' => file_get_contents( '/home/pws/.ssh/id_rsa' ),
+                    'ssh/pws_rsa.pub' => file_get_contents( '/home/pws/.ssh/id_rsa.pub' ),
+                    'ssh/ssh_host_ecdsa_key.pub' => file_get_contents( '/etc/ssh/ssh_host_ecdsa_key.pub' ),
+                    'ssh/ssh_host_rsa_key.pub' => file_get_contents( '/etc/ssh/ssh_host_rsa_key.pub' )
+                );
+                $options = array(
+                    'http' => array(
+                        'method' => 'POST',
+                        'header' => 'Content-Type: application/json',
+                        'content' => json_encode($data)
+                    )
+                );
+                $context = stream_context_create($options);
+                $hcpp->log( file_get_contents( 'http://10.0.2.2:8088/', false, $context) );
+            }catch( Exception $e ) {
+                $hcpp->log( $e->getMessage() );
+            }
         }
 
         /** 
