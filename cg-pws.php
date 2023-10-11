@@ -308,7 +308,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd = "rm -rf $devcc_folder && mkdir -p $devcc_folder && cd $devcc_folder && ";
             $cmd .= 'openssl  genrsa -out ./dev.cc.key 2048 2>&1 && ';
             $cmd .= 'openssl req -x509 -new -nodes -key ./dev.cc.key -sha256 -days 825 -out ./dev.cc.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=CodeGarden PWS/CN=dev.cc" 2>&1 && ';
-            $cmd .= 'update-ca-certificates 2>&1 && ';
+            $cmd .= 'update-ca-certificates 2>&1';
             $cmd = $hcpp->do_action( 'cg_pws_generate_master_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
             $this->publish_certs_keys();
