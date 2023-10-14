@@ -437,7 +437,7 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // Kickstart kludge to ensure apache2 and nginx startup on reboot
             $kicks = 5;
-            do 
+            do {
                 $cmd = '';
                 if ( strpos( shell_exec( 'service apache2 status' ), 'Active: active' ) === false ) {
                     $cmd .= 'service apache2 start';
@@ -448,7 +448,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 if ( $cmd != '' ) shell_exec( $cmd );
                 sleep(1);
                 $kicks--;
-            while( $cmd != '' && $kicks > 0 );
+            } while( $cmd != '' && $kicks > 0 );
 
             // Check for notifications on reboot
             $this->check_for_pws_notifications();
