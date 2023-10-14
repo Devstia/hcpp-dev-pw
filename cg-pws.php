@@ -418,6 +418,16 @@ if ( ! class_exists( 'CG_PWS') ) {
                 }
             }
 
+            // Kickstart kludge to ensure apache2 and nginx startup on reboot
+            $cmd = '';
+            if ( strpos( shell_exec( 'service apache2 status' ), 'Active: active' ) === false ) {
+                $cmd .= 'service apache2 start';
+            }
+            if ( strpos( shell_exec( 'service nginx status' ), 'Active: active' ) === false ) {
+                $cmd .= ';service nginx start';
+            }
+            if ( $cmd != '' ) shell_exec( $cmd );
+            
             // Generate ssh keypair for pws, debian
             $sshFiles = [
                 '/home/pws/.ssh/id_rsa',
@@ -434,16 +444,6 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // Always copy certs and keys back to the cg-pws app server on reboot
             $this->publish_certs_keys();
-
-            // Kickstart kludge to ensure apache2 and nginx startup on reboot
-            $cmd = '';
-            if ( strpos( shell_exec( 'service apache2 status' ), 'Active: active' ) === false ) {
-                $cmd .= 'service apache2 start';
-            }
-            if ( strpos( shell_exec( 'service nginx status' ), 'Active: active' ) === false ) {
-                $cmd .= 'service nginx start';
-            }
-            if ( $cmd != '' ) shell_exec( $cmd );
 
             // Check for notifications on reboot
             $this->check_for_pws_notifications();
