@@ -65,6 +65,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             global $hcpp;
             try {
                 $data = array(
+                    'pwsPass' => file_get_contents( '/home/admin/.pwsPass' ),
                     'ca/dev.cc.crt' => file_get_contents( '/usr/local/share/ca-certificates/dev.cc/dev.cc.crt' ),
                     'ca/dev.cc.key' => file_get_contents( '/usr/local/share/ca-certificates/dev.cc/dev.cc.key' ),
                     'ssh/debian_rsa' => file_get_contents( '/home/debian/.ssh/id_rsa' ),
