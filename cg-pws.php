@@ -626,7 +626,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $content .= '        var loginMsg = document.createElement("div");';
             $content .= '        var formLogin = document.getElementById("form_login");';
             $content .= '        formLogin.style.display = "none";';
-            $content .= '        loginMsg.textContent = "Please wait. Automatically logging in...";';
+            $content .= '        loginMsg.innerHTML = "<h1 class=\"login-title\">Welcome to CodeGarden PWS</h1><br><br><br>Please wait. Automatically logging in...";';
             $content .= '        formLogin.parentNode.insertBefore(loginMsg, formLogin.nextSibling);';
             $content .= '    }';
             $content .= '});';
