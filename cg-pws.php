@@ -29,6 +29,18 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'priv_update_sys_rrd', [ $this, 'priv_update_sys_rrd' ] );
             $hcpp->add_action( 'priv_log_user_logout', [ $this, 'priv_log_user_logout' ] );
             $hcpp->add_action( 'cg_pws_update_password', [ $this, 'cg_pws_update_password' ] );
+            $hcpp->add_action( 'priv_add_user_notification', [ $this, 'priv_add_user_notification'] );
+        }
+
+        /**
+         * Forward admin notifications to pws user
+         */
+        public function priv_add_user_notification( $args ) {
+            if ( $args[0] === 'admin' ) {
+                $cmd = '/usr/local/hestia/bin/v-add-user-notification pws "' . $args[1] . '" "' . $args[2] . '"';
+                shell_exec( $cmd );
+            }
+            return $args;
         }
 
         /**
