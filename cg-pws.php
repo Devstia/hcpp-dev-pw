@@ -604,6 +604,19 @@ if ( ! class_exists( 'CG_PWS') ) {
             //     $args['content'] .= $css;
             // }
 
+            // Forward to User menu to QuickStart for pws user
+            if ( isset( $_SESSION['user'] ) && $_SESSION['user'] == 'pws' ) {
+                if ( strpos( $_SERVER['REQUEST_URI'], '/list/user' ) === 0 ) {
+                    header('Location: /list/web/?quickstart=main');
+                    exit;
+                }
+
+                // Hide user menu from pws user
+                $content = $args['content'];
+                $content .= '<style>li.main-menu-item:nth-child(1){display:none;}</style>';
+                $args['content'] = $content;
+            }
+
             // Check for valid auto-login token
             if ( !isset( $_GET['alt'] ) ) return $args;
             $content = $args['content'];
