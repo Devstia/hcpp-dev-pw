@@ -2,7 +2,7 @@
 CodeGarden Personal Web Server plugin for HestiaCP enables CodeGarden features on the desktop app.
 
 &nbsp;
- > :warning: !!! Note: this repo is in progress; when completed, a release will appear in the release tab.
+ > :warning: !!! Note: NOT for live or production servers; for "localhost" development only! This repo contains code for ease-of-development only and may pose security risks on untested servers. Also, this repo is in progress; when completed, a release will appear in the release tab.
  
 &nbsp;
 ## Installation
