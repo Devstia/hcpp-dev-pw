@@ -287,7 +287,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 if ( $pma_token == '' ) {
                     $pma_token = $hcpp->nodeapp->random_chars( 16 );
                     file_put_contents( $pma_token_file, $pma_token );
-                    chmod( $pma_token_file, 0700 );
+                    chmod( $pma_token_file, 0640 );
                     chown( $pma_token_file, 'www-data' );
                     chgrp( $pma_token_file, 'www-data' );
                 }
@@ -300,7 +300,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $passwd = $this->encrypt( $passwd, $pma_token );
                 $pma_pwspass = '/tmp/pma_pwspass.txt';
                 file_put_contents( $pma_pwspass, $passwd );
-                chmod( $pma_pwspass, 0700 );
+                chmod( $pma_pwspass, 0640 );
                 chown( $pma_pwspass, 'www-data' );
                 chgrp( $pma_pwspass, 'www-data' );
                 echo $pma_token;
