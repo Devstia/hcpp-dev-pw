@@ -565,7 +565,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             // HestiaCP failed to white label.
             if ( $args['page'] == 'list_services' ) {
                 $content = $args['content'];
-                $content = str_replace( 'Hestia Control Panel', 'CodeGarden PWS', $content );
+                $content = str_replace( 'Hestia Control Panel', 'Devstia Personal Web', $content );
                 $args['content'] = $content;
             }
 
@@ -651,7 +651,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $content .= '        var loginMsg = document.createElement("div");';
             $content .= '        var formLogin = document.getElementById("form_login");';
             $content .= '        formLogin.style.display = "none";';
-            $content .= '        loginMsg.innerHTML = "<h1 class=\"login-title\">Welcome to CodeGarden PWS</h1>Please wait. Automatically logging in...<br><br><br>";';
+            $content .= '        loginMsg.innerHTML = "<h1 class=\"login-title\">Welcome to Devstia Personal Web</h1>Please wait. Automatically logging in...<br><br><br>";';
             $content .= '        formLogin.parentNode.insertBefore(loginMsg, formLogin.nextSibling);';
             $content .= '    }';
             $content .= '});';
