@@ -637,7 +637,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $altContent = trim( $hcpp->run( 'cat /tmp/alt.txt' ) );
             if ( $_GET['alt'] != $altContent ) return $args;
 
-            // Get the pws password
+            // Get the dev.pw password
             $passwd = trim( $hcpp->run( 'invoke-plugin cg_pws_pass' ) );
             $passwd = $this->decrypt( $passwd );
 
@@ -645,13 +645,13 @@ if ( ! class_exists( 'CG_PWS') ) {
             $content .= '<script>';
             $content .= 'document.addEventListener("DOMContentLoaded", function(event) {';
             $content .= '    if (document.getElementById("username") != null && document.getElementById("password") != null) {';
-            $content .= '        document.getElementById("username").value="pws";';
+            $content .= '        document.getElementById("username").value="devstia";';
             $content .= '        document.getElementById("password").value="' . $passwd . '";';
             $content .= '        document.getElementsByTagName("button")[0].click();';
             $content .= '        var loginMsg = document.createElement("div");';
             $content .= '        var formLogin = document.getElementById("form_login");';
             $content .= '        formLogin.style.display = "none";';
-            $content .= '        loginMsg.innerHTML = "<h1 class=\"login-title\">Welcome to Devstia Personal Web</h1>Please wait. Automatically logging in...<br><br><br>";';
+            $content .= '        loginMsg.innerHTML = "<h1 class=\"login-title\">Welcome to Devstia Preview</h1>Please wait. Automatically logging in...<br><br><br>";';
             $content .= '        formLogin.parentNode.insertBefore(loginMsg, formLogin.nextSibling);';
             $content .= '    }';
             $content .= '});';
