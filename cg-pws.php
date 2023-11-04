@@ -608,22 +608,24 @@ if ( ! class_exists( 'CG_PWS') ) {
          * submit login form if valid.
          */
         public function hcpp_head( $args ) {
-            // // Show green as our active color when using dark theme
-            // if ( strpos( $args['content'], 'dark.min.css' ) !== false ) {
-            //     $css = "<style>.main-menu-item-link.active .main-menu-item-label {";
-            //     $css .= "color:#33b100}@media (min-width: 768px) {";
-            //     $css .= ".main-menu-item-link.active {border-bottom-color:#33b100}}</style>";
-            //     $args['content'] .= $css;
-            // }
+            // Tweak our devstia logo and default theme
+            $css = '<style>.top-bar-logo img { height:39px; width:64px }';
+            if ( strpos( $args['content'], 'dark.min.css' ) !== false ) {
+                $css = ".main-menu-item-link.active .main-menu-item-label {";
+                $css .= "color:#FF2205}@media (min-width: 768px) {";
+                $css .= ".main-menu-item-link.active {border-bottom-color:#FF2205}}";
+            }
+            $css .= '</style>';
+            $args['content'] .= $css;
 
-            // Forward to User menu to QuickStart for pws user
-            if ( isset( $_SESSION['user'] ) && $_SESSION['user'] == 'pws' ) {
+            // Forward to User menu to QuickStart for devstia user
+            if ( isset( $_SESSION['user'] ) && $_SESSION['user'] == 'devstia' ) {
                 if ( strpos( $_SERVER['REQUEST_URI'], '/list/user' ) === 0 ) {
                     header('Location: /list/web/?quickstart=main');
                     exit;
                 }
 
-                // Hide user menu from pws user
+                // Hide user menu from devstia user
                 $content = $args['content'];
                 $content .= '<style>li.main-menu-item:nth-child(1){display:none;}</style>';
                 $args['content'] = $content;
