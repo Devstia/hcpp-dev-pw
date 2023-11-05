@@ -14,7 +14,7 @@ echo "debian:$passwd" | chpasswd
 (echo "$passwd"; echo "$passwd") | smbpasswd -s -a "pws"
 
 ## Allow us to hook into the password change event from our plugins (WebDAV, etc)
-php -r 'require "/usr/local/hestia/web/pluginable.php"; $hcpp->do_action("cg_pws_update_password", "'"$passwd"'");'
+php -r 'require "/usr/local/hestia/web/pluginable.php"; $hcpp->do_action("dev_pw_update_password", "'"$passwd"'");'
 
 ## Support advanced phpMyAdmin SSO, Create/update pws permissions for MySQL/phpMyAdmin
 echo "REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'pws'@'localhost';" | mysql

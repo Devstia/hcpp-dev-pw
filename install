@@ -2,13 +2,13 @@
 
 # PWS branding and conveinence features
 /usr/local/hestia/bin/v-change-sys-config-value LOGIN_STYLE old
-cp -r /usr/local/hestia/plugins/cg-pws/images/* /usr/local/hestia/web/images/
+cp -r /usr/local/hestia/plugins/dev-pw/images/* /usr/local/hestia/web/images/
 
 # Advanced phpMyAdmin SSO
-cp /usr/local/hestia/plugins/cg-pws/cg-pws-sso.php /etc/phpmyadmin/conf.d/cg-pws-sso.php
+cp /usr/local/hestia/plugins/dev-pw/dev-pw-sso.php /etc/phpmyadmin/conf.d/dev-pw-sso.php
 
 # Update localhost web domain
 ./update
 
 # Notify installation has finished
-/usr/local/hestia/bin/v-add-user-notification admin "CG-PWS" "<span>&#127811;</span> CG-PWS plugin has finished installing."
+/usr/local/hestia/bin/v-add-user-notification admin "DEV-PW" "<span>&#127811;</span> DEV-PW plugin has finished installing."

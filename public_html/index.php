@@ -8,6 +8,6 @@ $alt = "";
 if ( isset( $_GET['alt'] ) ) {
    $alt = '&alt=' . $_GET['alt'];
 }
-$redirectURL = "https://local.dev.cc:" . $port . "/pluginable.php?load=cg-pws" . $alt;
+$redirectURL = "https://local.dev.pw:" . $port . "/pluginable.php?load=dev-pw" . $alt;
 header("Location: " . $redirectURL);
 exit;

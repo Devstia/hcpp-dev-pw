@@ -1,23 +1,23 @@
 <?php
 /**
- * Extend the HestiaCP Pluginable object with our CG_PWS object for
+ * Extend the HestiaCP Pluginable object with our DEV_PW object for
  * providing a localhost development server functionality.
  * 
  * @version 1.0.0
  * @license GPL-3.0
- * @link https://github.com/virtuosoft-dev/hcpp-cg-pws
+ * @link https://github.com/virtuosoft-dev/hcpp-dev-pw
  * 
  */
 
-if ( ! class_exists( 'CG_PWS') ) {
-    class CG_PWS {
+if ( ! class_exists( 'DEV_PW') ) {
+    class DEV_PW {
         
         /**
          * Constructor, listen for adding, or listing websites
          */
         public function __construct() {
             global $hcpp;
-            $hcpp->cg_pws = $this;
+            $hcpp->dev_pw = $this;
             $hcpp->add_action( 'hcpp_update_core_cmd', [ $this, 'hcpp_update_core_cmd' ] );
             $hcpp->add_action( 'hcpp_invoke_plugin', [ $this, 'hcpp_invoke_plugin' ] );
             $hcpp->add_action( 'hcpp_new_domain_ready', [ $this, 'hcpp_new_domain_ready' ] );
@@ -28,7 +28,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $hcpp->add_action( 'hcpp_head', [ $this, 'hcpp_head' ] );
             $hcpp->add_action( 'priv_update_sys_rrd', [ $this, 'priv_update_sys_rrd' ] );
             $hcpp->add_action( 'priv_log_user_logout', [ $this, 'priv_log_user_logout' ] );
-            $hcpp->add_action( 'cg_pws_update_password', [ $this, 'cg_pws_update_password' ] );
+            $hcpp->add_action( 'dev_pw_update_password', [ $this, 'dev_pw_update_password' ] );
             $hcpp->add_action( 'priv_add_user_notification', [ $this, 'priv_add_user_notification'] );
         }
 
@@ -46,7 +46,7 @@ if ( ! class_exists( 'CG_PWS') ) {
         /**
          * Update encrypted password for the pws user.
          */
-        public function cg_pws_update_password( $passwd ) {
+        public function dev_pw_update_password( $passwd ) {
             $passwd = $this->encrypt( $passwd );
             file_put_contents( '/home/admin/.pwsPass', $passwd );
         }
@@ -55,7 +55,7 @@ if ( ! class_exists( 'CG_PWS') ) {
          * Re-apply white label, pma sso, on core update.
          */
         public function hcpp_update_core_cmd( $cmd ) {
-            $cmd = 'cd /usr/local/hestia/plugins/cg-pws && ./install && ' . $cmd;
+            $cmd = 'cd /usr/local/hestia/plugins/dev-pw && ./install && ' . $cmd;
             return $cmd;
         }
 
@@ -71,15 +71,15 @@ if ( ! class_exists( 'CG_PWS') ) {
          }
 
         /**
-         * Publish certificates and keys to the cg-pws app server.
+         * Publish certificates and keys to the devstia-app server.
          */
         public function publish_certs_keys() {
             global $hcpp;
             try {
                 $data = array(
                     'pwsPass' => file_get_contents( '/home/admin/.pwsPass' ),
-                    'ca/dev.cc.crt' => file_get_contents( '/usr/local/share/ca-certificates/dev.cc/dev.cc.crt' ),
-                    'ca/dev.cc.key' => file_get_contents( '/usr/local/share/ca-certificates/dev.cc/dev.cc.key' ),
+                    'ca/dev.pw.crt' => file_get_contents( '/usr/local/share/ca-certificates/dev.pw/dev.pw.crt' ),
+                    'ca/dev.pw.key' => file_get_contents( '/usr/local/share/ca-certificates/dev.pw/dev.pw.key' ),
                     'ssh/debian_rsa' => file_get_contents( '/home/debian/.ssh/id_rsa' ),
                     'ssh/debian_rsa.pub' => file_get_contents( '/home/debian/.ssh/id_rsa.pub' ),
                     'ssh/pws_rsa' => file_get_contents( '/home/pws/.ssh/id_rsa' ),
@@ -97,7 +97,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $context = stream_context_create($options);
                 $hcpp->log( file_get_contents( 'http://10.0.2.2:8088/', false, $context) );
             }catch( Exception $e ) {
-                $hcpp->log( 'Error in CG_PWS->publish_certs_keys: ' . $e->getMessage() );
+                $hcpp->log( 'Error in DEV_PW->publish_certs_keys: ' . $e->getMessage() );
             }
         }
 
@@ -106,7 +106,7 @@ if ( ! class_exists( 'CG_PWS') ) {
          */
         public function check_for_pws_notifications() {
             global $hcpp;
-            $jsonUrl = 'https://code.gdn/pws-notifications/index.php';
+            $jsonUrl = 'https://devstia.com/dev-pw-notifications/index.php';
             $contextOptions = [
                 'ssl' => [
                     'verify_peer' => true,
@@ -240,7 +240,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $lines = explode( "\r\n", $_REQUEST['v_aliases'] );
                 $domains = array_map( 'trim', $lines );
                 array_unshift($domains, $_REQUEST['v_domain'] );
-                $args = [ 'cg_pws_generate_website_cert', $user ];
+                $args = [ 'dev_pw_generate_website_cert', $user ];
                 $args = array_merge( $args, $domains );
                 $hcpp->log( $hcpp->run( 'invoke-plugin ' . implode( ' ', $args ) ) );    
             }
@@ -248,13 +248,13 @@ if ( ! class_exists( 'CG_PWS') ) {
 
         // Generate certs on demand
         public function hcpp_invoke_plugin( $args ) {
-            if ( $args[0] == 'cg_pws_pass' ) {
+            if ( $args[0] == 'dev_pw_pass' ) {
                 echo shell_exec( 'cat /home/admin/.pwsPass' );
             }
-            if ( $args[0] == 'cg_pws_generate_master_cert' ) {
+            if ( $args[0] == 'dev_pw_generate_master_cert' ) {
                 $this->generate_master_cert();
             }
-            if ( $args[0] == 'cg_pws_generate_website_cert') {
+            if ( $args[0] == 'dev_pw_generate_website_cert') {
                 $user = $args[1];
                 $domains = array();
                 for ($i = 2; $i < count($args); $i++) {
@@ -262,13 +262,13 @@ if ( ! class_exists( 'CG_PWS') ) {
                 }
                 $this->generate_website_cert( $user, $domains );
             }
-            if ( $args[0] == 'cg_pws_regenerate_certificates' ) {
+            if ( $args[0] == 'dev_pw_regenerate_certificates' ) {
                 $this->regenerate_certificates();
             }
-            if ( $args[0] == 'cg_pws_regenerate_ssh_keys' ) {
+            if ( $args[0] == 'dev_pw_regenerate_ssh_keys' ) {
                 $this->regenerate_ssh_keys();
             }
-            if ( $args[0] == 'cg_pws_pma_sso' ) {
+            if ( $args[0] == 'dev_pw_pma_sso' ) {
 
                 // Renew or expire the token file
                 global $hcpp;
@@ -317,24 +317,24 @@ if ( ! class_exists( 'CG_PWS') ) {
 
             // Generate the master certificate
             global $hcpp;
-            $devcc_folder = '/usr/local/share/ca-certificates/dev.cc';
+            $devcc_folder = '/usr/local/share/ca-certificates/dev.pw';
             $cmd = "rm -rf $devcc_folder && mkdir -p $devcc_folder && cd $devcc_folder && ";
-            $cmd .= 'openssl  genrsa -out ./dev.cc.key 2048 2>&1 && ';
-            $cmd .= 'openssl req -x509 -new -nodes -key ./dev.cc.key -sha256 -days 825 -out ./dev.cc.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=CodeGarden PWS/CN=dev.cc" 2>&1 && ';
+            $cmd .= 'openssl  genrsa -out ./dev.pw.key 2048 2>&1 && ';
+            $cmd .= 'openssl req -x509 -new -nodes -key ./dev.pw.key -sha256 -days 825 -out ./dev.pw.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=Devstia Preview/CN=dev.pw" 2>&1 && ';
             $cmd .= 'update-ca-certificates 2>&1';
-            $cmd = $hcpp->do_action( 'cg_pws_generate_master_cert', $cmd );
+            $cmd = $hcpp->do_action( 'dev_pw_generate_master_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
             $this->publish_certs_keys();
 
-            // Generate local.dev.cc for the control panel itself
-            $hcpp->log( "Generating local.dev.cc certificate" );
-            $this->generate_website_cert( 'admin', [ 'local.dev.cc', 'localhost' ] );
+            // Generate local.dev.pw for the control panel itself
+            $hcpp->log( "Generating local.dev.pw certificate" );
+            $this->generate_website_cert( 'admin', [ 'local.dev.pw', 'localhost' ] );
 
             // Update the Hestia nginx certificate
-            $cmd = 'cp /home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.crt /usr/local/hestia/ssl/certificate.crt && ';
-            $cmd .= 'cp /home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.key /usr/local/hestia/ssl/certificate.key && ';
+            $cmd = 'cp /home/admin/conf/web/local.dev.pw/ssl/local.dev.pw.crt /usr/local/hestia/ssl/certificate.crt && ';
+            $cmd .= 'cp /home/admin/conf/web/local.dev.pw/ssl/local.dev.pw.key /usr/local/hestia/ssl/certificate.key && ';
             $cmd .= 'service hestia restart';
-            $cmd = $hcpp->do_action( 'cg_pws_update_hestia_cert', $cmd );
+            $cmd = $hcpp->do_action( 'dev_pw_update_hestia_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
         }
 
@@ -354,10 +354,10 @@ if ( ! class_exists( 'CG_PWS') ) {
                 return;
             }
 
-            // Generate the certificate data in a fresh cg_pws_ssl
-            $cg_pws_ssl = '/home/' . $user . '/conf/web/' . $domains[0] . '/cg_pws_ssl';
-            $cmd = 'rm -rf ' . $cg_pws_ssl . ' && ';
-            $cmd .= 'mkdir -p ' . $cg_pws_ssl;
+            // Generate the certificate data in a fresh dev_pw_ssl
+            $dev_pw_ssl = '/home/' . $user . '/conf/web/' . $domains[0] . '/dev_pw_ssl';
+            $cmd = 'rm -rf ' . $dev_pw_ssl . ' && ';
+            $cmd .= 'mkdir -p ' . $dev_pw_ssl;
             $hcpp->log( $cmd );
             shell_exec( $cmd );
 
@@ -382,22 +382,22 @@ if ( ! class_exists( 'CG_PWS') ) {
             $template .= "stateOrProvinceName = California\n";
             $template .= "localityName = San Diego\n";
             $template .= "organizationName = Virtuosoft\n";
-            $template .= "organizationalUnitName = CodeGarden PWS\n";
+            $template .= "organizationalUnitName = Devstia Preview\n";
             $template .= "commonName = $domains[0]\n";
             $template .= "\n";
-            $template = $hcpp->do_action( 'cg_pws_generate_website_cert_template', $template );
-            file_put_contents( $cg_pws_ssl . '/template.cnf', $template );
+            $template = $hcpp->do_action( 'dev_pw_generate_website_cert_template', $template );
+            file_put_contents( $dev_pw_ssl . '/template.cnf', $template );
 
-            $cmd = 'cd ' . $cg_pws_ssl . ' && ';
+            $cmd = 'cd ' . $dev_pw_ssl . ' && ';
             $cmd .= 'openssl genrsa -out ./' . $domains[0] . '.key 2048 && ';
             $cmd .= 'openssl req -new -key ./' . $domains[0] . '.key -out ./' . $domains[0] . ".csr -subj '/CN=" . $domains[0] . "'" . ' -config ./template.cnf && ';
-            $cmd .= 'openssl x509 -req -in ./' . $domains[0] . '.csr -CA /usr/local/share/ca-certificates/dev.cc/dev.cc.crt -CAkey /usr/local/share/ca-certificates/dev.cc/dev.cc.key -CAcreateserial -out ./' . $domains[0] . '.crt -days 825 -sha256 -extfile ./template.cnf && ';
+            $cmd .= 'openssl x509 -req -in ./' . $domains[0] . '.csr -CA /usr/local/share/ca-certificates/dev.pw/dev.pw.crt -CAkey /usr/local/share/ca-certificates/dev.pw/dev.pw.key -CAcreateserial -out ./' . $domains[0] . '.crt -days 825 -sha256 -extfile ./template.cnf && ';
             $cmd .= 'cat ./' . $domains[0] . '.key ./' . $domains[0] . '.crt > ./' . $domains[0] . '.pem && ';
             $cmd .= 'chmod -R 644 ./ && ';
             $cmd .= '/usr/local/hestia/bin/v-delete-web-domain-ssl ' . $user . ' ' . $domains[0] . ' "no" ; ';
-            $cmd .= '/usr/local/hestia/bin/v-add-web-domain-ssl ' . $user . ' ' . $domains[0] . ' /home/' . $user . '/conf/web/' . $domains[0] . '/cg_pws_ssl && ';
+            $cmd .= '/usr/local/hestia/bin/v-add-web-domain-ssl ' . $user . ' ' . $domains[0] . ' /home/' . $user . '/conf/web/' . $domains[0] . '/dev_pw_ssl && ';
             $cmd .= '/usr/local/hestia/bin/v-add-web-domain-ssl-force ' . $user . ' ' . $domains[0]; 
-            $cmd = $hcpp->do_action( 'cg_pws_generate_website_cert', $cmd );
+            $cmd = $hcpp->do_action( 'dev_pw_generate_website_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
         }
 
@@ -419,10 +419,10 @@ if ( ! class_exists( 'CG_PWS') ) {
         public function hcpp_rebooted() {
             // Generate the master certificate if it doesn't exist
             $caFiles = [
-                '/home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.crt',
-                '/home/admin/conf/web/local.dev.cc/ssl/local.dev.cc.key',
-                '/usr/local/share/ca-certificates/dev.cc/dev.cc.crt', 
-                '/usr/local/share/ca-certificates/dev.cc/dev.cc.key'
+                '/home/admin/conf/web/local.dev.pw/ssl/local.dev.pw.crt',
+                '/home/admin/conf/web/local.dev.pw/ssl/local.dev.pw.key',
+                '/usr/local/share/ca-certificates/dev.pw/dev.pw.crt', 
+                '/usr/local/share/ca-certificates/dev.pw/dev.pw.key'
             ];
             foreach ( $caFiles as $file ) {
                 if ( ! file_exists( $file ) ) {
@@ -445,7 +445,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 }
             }
 
-            // Always copy certs and keys back to the cg-pws app server on reboot
+            // Always copy certs and keys back to the devstia-app server on reboot
             $this->publish_certs_keys();
 
             // Kickstart kludge to ensure apache2 and nginx startup on reboot
@@ -488,7 +488,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             $cmd .= 'cp -f /home/pws/.ssh/id_rsa.pub /home/pws/.ssh/authorized_keys && ';
             $cmd .= 'chown pws:pws /home/pws/.ssh/authorized_keys && chmod 644 /home/pws/.ssh/authorized_keys';
             
-            $cmd = $hcpp->do_action( 'cg_pws_regenerate_ssh_keys', $cmd );
+            $cmd = $hcpp->do_action( 'dev_pw_regenerate_ssh_keys', $cmd );
             shell_exec( $cmd );
             $this->publish_certs_keys();
         }
@@ -520,7 +520,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                 }
             }
             $cmd = '(service nginx reload) > /dev/null 2>&1 &';
-            $cmd = $hcpp->do_action( 'cg_pws_nginx_reload', $cmd );
+            $cmd = $hcpp->do_action( 'dev_pw_nginx_reload', $cmd );
             shell_exec( $cmd );
         }
 
@@ -565,7 +565,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             // HestiaCP failed to white label.
             if ( $args['page'] == 'list_services' ) {
                 $content = $args['content'];
-                $content = str_replace( 'Hestia Control Panel', 'Devstia Personal Web', $content );
+                $content = str_replace( 'Hestia Control Panel', 'Devstia Preview', $content );
                 $args['content'] = $content;
             }
 
@@ -575,12 +575,12 @@ if ( ! class_exists( 'CG_PWS') ) {
                 $content = $args['content'];
                 $parse = '';
 
-                $pma_token = $hcpp->run( 'invoke-plugin cg_pws_pma_sso' );                
-                while( false !== strpos( $content, '//local.dev.cc/phpmyadmin/' ) ) {
+                $pma_token = $hcpp->run( 'invoke-plugin dev_pw_pma_sso' );                
+                while( false !== strpos( $content, '//local.dev.pw/phpmyadmin/' ) ) {
 
                     // Find each phpMyAdmin URL
-                    $parse .= $hcpp->getLeftMost( $content, '//local.dev.cc/phpmyadmin/' );
-                    $content = $hcpp->delLeftMost( $content, '//local.dev.cc/phpmyadmin/' );
+                    $parse .= $hcpp->getLeftMost( $content, '//local.dev.pw/phpmyadmin/' );
+                    $content = $hcpp->delLeftMost( $content, '//local.dev.pw/phpmyadmin/' );
 
                     // Find the database name
                     $remaining = $hcpp->getLeftMost( $content, '"' );
@@ -593,7 +593,7 @@ if ( ! class_exists( 'CG_PWS') ) {
                     }
 
                     // Replace the phpMyAdmin URL with our version that includes our token and db
-                    $parse .= '//local.dev.cc/phpmyadmin/?pma_token=' . $pma_token . $db .'"';
+                    $parse .= '//local.dev.pw/phpmyadmin/?pma_token=' . $pma_token . $db .'"';
                 }
                 if ( $parse != '' ) {
                     $content = $parse . $content;
@@ -640,7 +640,7 @@ if ( ! class_exists( 'CG_PWS') ) {
             if ( $_GET['alt'] != $altContent ) return $args;
 
             // Get the dev.pw password
-            $passwd = trim( $hcpp->run( 'invoke-plugin cg_pws_pass' ) );
+            $passwd = trim( $hcpp->run( 'invoke-plugin dev_pw_pass' ) );
             $passwd = $this->decrypt( $passwd );
 
             // Inject the auto-login script
@@ -697,5 +697,5 @@ if ( ! class_exists( 'CG_PWS') ) {
         }
         
     }
-    new CG_PWS(); 
+    new DEV_PW(); 
 } 

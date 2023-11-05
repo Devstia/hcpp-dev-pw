@@ -1,4 +1,4 @@
 #!/bin/bash
 
 # Remove Advanced phpMyAdmin SSO
-rm -rf /etc/phpmyadmin/conf.d/cg-pws-sso.php
+rm -rf /etc/phpmyadmin/conf.d/dev-pw-sso.php
