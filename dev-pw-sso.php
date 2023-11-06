@@ -1,12 +1,12 @@
 <?php
 $pma_token_file = '/tmp/pma_token.txt';
-$pma_pwspass = '/tmp/pma_pwspass.txt';
+$pma_pwpass = '/tmp/pma_pwpass.txt';
 
 // Remove token on logout
 if ( isset( $_REQUEST['route'] ) && $_REQUEST['route'] == '/logout' ) {
     setcookie( "pma_token", "", time() - 3600 );
     unlink( $pma_token_file );
-    unlink( $pma_pwspass );
+    unlink( $pma_pwpass );
     return;
 }
 
@@ -28,20 +28,20 @@ setcookie( "pma_token", $pma_token, time() + 3600 );
 touch( $pma_token_file );
 
 // Decrypt current password
-$pwsPass = '';
-if ( file_exists( $pma_pwspass ) ) {
-    $pwsPass = file_get_contents( $pma_pwspass );
+$pwPass = '';
+if ( file_exists( $pma_pwpass ) ) {
+    $pwPass = file_get_contents( $pma_pwpass );
     $key = md5( $pma_token );
-    $pwsPass = explode( ':', $pwsPass );
-    $encrypted_data = base64_decode( $pwsPass[0] );
-    $iv = base64_decode( $pwsPass[1] );
-    $pwsPass = openssl_decrypt( $encrypted_data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv );
+    $pwPass = explode( ':', $pwPass );
+    $encrypted_data = base64_decode( $pwPass[0] );
+    $iv = base64_decode( $pwPass[1] );
+    $pwPass = openssl_decrypt( $encrypted_data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv );
 }else{
     return;
 }
 
 // Valid token, allow access and renew token
 $cfg['Servers'][1]['auth_type'] = 'config';
-$cfg['Servers'][1]['user'] = 'pws';
-$cfg['Servers'][1]['password'] = $pwsPass; 
+$cfg['Servers'][1]['user'] = 'devstia';
+$cfg['Servers'][1]['password'] = $pwPass; 
 

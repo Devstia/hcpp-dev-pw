@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# PWS branding and conveinence features
+# Devstia branding and conveinence features
 /usr/local/hestia/bin/v-change-sys-config-value LOGIN_STYLE old
 cp -r /usr/local/hestia/plugins/dev-pw/images/* /usr/local/hestia/web/images/
 

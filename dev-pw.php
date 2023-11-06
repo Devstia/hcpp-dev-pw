@@ -33,22 +33,22 @@ if ( ! class_exists( 'DEV_PW') ) {
         }
 
         /**
-         * Forward admin notifications to pws user
+         * Forward admin notifications to devstia user
          */
         public function priv_add_user_notification( $args ) {
             if ( $args[0] === 'admin' ) {
-                $cmd = '/usr/local/hestia/bin/v-add-user-notification pws "' . $args[1] . '" "' . $args[2] . '"';
+                $cmd = '/usr/local/hestia/bin/v-add-user-notification devstia "' . $args[1] . '" "' . $args[2] . '"';
                 shell_exec( $cmd );
             }
             return $args;
         }
 
         /**
-         * Update encrypted password for the pws user.
+         * Update encrypted password for the devstia user.
          */
         public function dev_pw_update_password( $passwd ) {
             $passwd = $this->encrypt( $passwd );
-            file_put_contents( '/home/admin/.pwsPass', $passwd );
+            file_put_contents( '/home/admin/.pwPass', $passwd );
         }
 
         /**
@@ -64,9 +64,9 @@ if ( ! class_exists( 'DEV_PW') ) {
          */
          public function priv_log_user_logout( $args ) {
             $pma_token_file = '/tmp/pma_token.txt';
-            $pma_pwspass = '/tmp/pma_pwspass.txt';
+            $pma_pwpass = '/tmp/pma_pwpass.txt';
             unlink( $pma_token_file );
-            unlink( $pma_pwspass );
+            unlink( $pma_pwpass );
             return $args;
          }
 
@@ -77,13 +77,13 @@ if ( ! class_exists( 'DEV_PW') ) {
             global $hcpp;
             try {
                 $data = array(
-                    'pwsPass' => file_get_contents( '/home/admin/.pwsPass' ),
+                    'pwPass' => file_get_contents( '/home/admin/.pwPass' ),
                     'ca/dev.pw.crt' => file_get_contents( '/usr/local/share/ca-certificates/dev.pw/dev.pw.crt' ),
                     'ca/dev.pw.key' => file_get_contents( '/usr/local/share/ca-certificates/dev.pw/dev.pw.key' ),
                     'ssh/debian_rsa' => file_get_contents( '/home/debian/.ssh/id_rsa' ),
                     'ssh/debian_rsa.pub' => file_get_contents( '/home/debian/.ssh/id_rsa.pub' ),
-                    'ssh/pws_rsa' => file_get_contents( '/home/pws/.ssh/id_rsa' ),
-                    'ssh/pws_rsa.pub' => file_get_contents( '/home/pws/.ssh/id_rsa.pub' ),
+                    'ssh/devstia_rsa' => file_get_contents( '/home/devstia/.ssh/id_rsa' ),
+                    'ssh/devstia_rsa.pub' => file_get_contents( '/home/devstia/.ssh/id_rsa.pub' ),
                     'ssh/ssh_host_ecdsa_key.pub' => file_get_contents( '/etc/ssh/ssh_host_ecdsa_key.pub' ),
                     'ssh/ssh_host_rsa_key.pub' => file_get_contents( '/etc/ssh/ssh_host_rsa_key.pub' )
                 );
@@ -104,7 +104,7 @@ if ( ! class_exists( 'DEV_PW') ) {
         /** 
          * Check for notifications on reboot and every 5 minutes.
          */
-        public function check_for_pws_notifications() {
+        public function check_for_pw_notifications() {
             global $hcpp;
             $jsonUrl = 'https://devstia.com/dev-pw-notifications/index.php';
             $contextOptions = [
@@ -120,23 +120,23 @@ if ( ! class_exists( 'DEV_PW') ) {
                 $hcpp->log('Error: Failed to fetch notifications from ' . $jsonUrl);
                 return;
             }
-            $pwsNoticeIndex = 0;
-            $pwsNoticeIndexFile = "/usr/local/hestia/data/hcpp/pws-notice-index.txt";
-            if ( file_exists( $pwsNoticeIndexFile ) ) {
-                $pwsNoticeIndex = (int)file_get_contents( $pwsNoticeIndexFile );
+            $pwNoticeIndex = 0;
+            $pwNoticeIndexFile = "/usr/local/hestia/data/hcpp/pw-notice-index.txt";
+            if ( file_exists( $pwNoticeIndexFile ) ) {
+                $pwNoticeIndex = (int)file_get_contents( $pwNoticeIndexFile );
             }
             $messages = json_decode($jsonData, true);
             foreach ($messages as $message) {
-                if ( (int)$message['id'] <= $pwsNoticeIndex ) continue;
-                $pwsNoticeIndex = (int)$message['id'];
-                file_put_contents( $pwsNoticeIndexFile, $pwsNoticeIndex );
+                if ( (int)$message['id'] <= $pwNoticeIndex ) continue;
+                $pwNoticeIndex = (int)$message['id'];
+                file_put_contents( $pwNoticeIndexFile, $pwNoticeIndex );
                 $title = $this->sanitizeMessage( $message['title'] );
                 $message = $this->sanitizeMessage( $message['message'] );
-                $hcpp->run( 'add-user-notification pws ' . $title . ' ' . $message);
+                $hcpp->run( 'add-user-notification devstia ' . $title . ' ' . $message);
             }
         }
         public function priv_update_sys_rrd( $args ) {
-            $this->check_for_pws_notifications();
+            $this->check_for_pw_notifications();
             return $args;
         }
         
@@ -156,7 +156,7 @@ if ( ! class_exists( 'DEV_PW') ) {
          */
         public function hcpp_nginx_reload( $cmd ) {
             
-            // Find all nginx.conf and nginx.ssl.conf files in pws account
+            // Find all nginx.conf and nginx.ssl.conf files in devstia account
             function modify_nginx_conf_file( $filePath ) {
                 global $hcpp;
                 $lines = file( $filePath );
@@ -198,7 +198,7 @@ if ( ! class_exists( 'DEV_PW') ) {
                     }
                 }
             }
-            $directory = '/home/pws/conf/web';
+            $directory = '/home/devstia/conf/web';
             find_nginx_conf_files( $directory );
             return $cmd;
         }
@@ -249,7 +249,7 @@ if ( ! class_exists( 'DEV_PW') ) {
         // Generate certs on demand
         public function hcpp_invoke_plugin( $args ) {
             if ( $args[0] == 'dev_pw_pass' ) {
-                echo shell_exec( 'cat /home/admin/.pwsPass' );
+                echo shell_exec( 'cat /home/admin/.pwPass' );
             }
             if ( $args[0] == 'dev_pw_generate_master_cert' ) {
                 $this->generate_master_cert();
@@ -292,24 +292,24 @@ if ( ! class_exists( 'DEV_PW') ) {
                     chgrp( $pma_token_file, 'www-data' );
                 }
 
-                // Get the pws password
-                $passwd = trim( shell_exec( 'cat /home/admin/.pwsPass' ) );
+                // Get the devstia preview password
+                $passwd = trim( shell_exec( 'cat /home/admin/.pwPass' ) );
                 $passwd = $this->decrypt( $passwd );
 
                 // Re-encrypt it using the pma_token as the key
                 $passwd = $this->encrypt( $passwd, $pma_token );
-                $pma_pwspass = '/tmp/pma_pwspass.txt';
-                file_put_contents( $pma_pwspass, $passwd );
-                chmod( $pma_pwspass, 0640 );
-                chown( $pma_pwspass, 'www-data' );
-                chgrp( $pma_pwspass, 'www-data' );
+                $pma_pwpass = '/tmp/pma_pwpass.txt';
+                file_put_contents( $pma_pwpass, $passwd );
+                chmod( $pma_pwpass, 0640 );
+                chown( $pma_pwpass, 'www-data' );
+                chgrp( $pma_pwpass, 'www-data' );
                 echo $pma_token;
             }
             return $args;
         }
 
         /**
-         * Generate the master certificate for HestiaCP, PWS. This will overwrite
+         * Generate the master certificate for HestiaCP, Devstia Preview. This will overwrite
          * any existing certificate if one already exists; then add it
          * to the system trusted certificates.
          */
@@ -431,10 +431,10 @@ if ( ! class_exists( 'DEV_PW') ) {
                 }
             }
             
-            // Generate ssh keypair for pws, debian
+            // Generate ssh keypair for devstia, debian
             $sshFiles = [
-                '/home/pws/.ssh/id_rsa',
-                '/home/pws/.ssh/id_rsa.pub',
+                '/home/devstia/.ssh/id_rsa',
+                '/home/devstia/.ssh/id_rsa.pub',
                 '/home/debian/.ssh/id_rsa',
                 '/home/debian/.ssh/id_rsa.pub'
             ];
@@ -464,15 +464,15 @@ if ( ! class_exists( 'DEV_PW') ) {
             } while( $cmd != '' && $kicks > 0 );
 
             // Check for notifications on reboot
-            $this->check_for_pws_notifications();
+            $this->check_for_pw_notifications();
         }
 
         /**
-         * Generate a new ssh keypair for the pws and debian users.
+         * Generate a new ssh keypair for the devstia and debian users.
          */
         public function regenerate_ssh_keys() {
             global $hcpp;
-            $hcpp->log( 'Regenerating ssh keys for debian and pws...' );
+            $hcpp->log( 'Regenerating ssh keys for debian and devstia...' );
 
             // debian
             $cmd = 'rm -rf /home/debian/.ssh && mkdir -p /home/debian/.ssh && ';
@@ -481,12 +481,12 @@ if ( ! class_exists( 'DEV_PW') ) {
             $cmd .= 'cp -f /home/debian/.ssh/id_rsa.pub /home/debian/.ssh/authorized_keys && ';
             $cmd .= 'chown debian:debian /home/debian/.ssh/authorized_keys && chmod 600 /home/debian/.ssh/authorized_keys && ';
 
-            // pws
-            $cmd .= 'rm -rf /home/pws/.ssh && mkdir -p /home/pws/.ssh && ';
-            $cmd .= 'chown -R pws:pws /home/pws/.ssh && chmod -R 755 /home/pws/.ssh && ';
-            $cmd .= 'runuser -l pws -c \'ssh-keygen -t rsa -b 4096 -f /home/pws/.ssh/id_rsa -q -N ""\' && ';
-            $cmd .= 'cp -f /home/pws/.ssh/id_rsa.pub /home/pws/.ssh/authorized_keys && ';
-            $cmd .= 'chown pws:pws /home/pws/.ssh/authorized_keys && chmod 644 /home/pws/.ssh/authorized_keys';
+            // devstia
+            $cmd .= 'rm -rf /home/devstia/.ssh && mkdir -p /home/devstia/.ssh && ';
+            $cmd .= 'chown -R devstia:devstia /home/devstia/.ssh && chmod -R 755 /home/devstia/.ssh && ';
+            $cmd .= 'runuser -l devstia -c \'ssh-keygen -t rsa -b 4096 -f /home/devstia/.ssh/id_rsa -q -N ""\' && ';
+            $cmd .= 'cp -f /home/devstia/.ssh/id_rsa.pub /home/devstia/.ssh/authorized_keys && ';
+            $cmd .= 'chown devstia:devstia /home/devstia/.ssh/authorized_keys && chmod 644 /home/devstia/.ssh/authorized_keys';
             
             $cmd = $hcpp->do_action( 'dev_pw_regenerate_ssh_keys', $cmd );
             shell_exec( $cmd );
@@ -499,7 +499,7 @@ if ( ! class_exists( 'DEV_PW') ) {
         public function regenerate_certificates() {
             global $hcpp;
             $hcpp->log( 'Regenerating certificates...' );
-            $path = '/home/pws/conf/web';
+            $path = '/home/devstia/conf/web';
             $this->generate_master_cert();
             if ( is_dir($path) ) {
                 $directory = new DirectoryIterator( $path );
@@ -507,7 +507,7 @@ if ( ! class_exists( 'DEV_PW') ) {
                     if ( $file->isDir() && !$file->isDot() ) {
                         $domain = $file->getFilename();
                         $hcpp->log( 'Regenerating certificate for ' . $domain );
-                        $detail = $hcpp->run( "list-web-domain pws $domain json" );
+                        $detail = $hcpp->run( "list-web-domain devstia $domain json" );
                         if ( $detail != NULL ) {
                             $domains = $detail[$domain]['ALIAS'];
                             $domains = explode(",", $domains);
@@ -515,7 +515,7 @@ if ( ! class_exists( 'DEV_PW') ) {
                         }else {
                             $domains = array( $domain );
                         }
-                        $this->generate_website_cert( 'pws', $domains );
+                        $this->generate_website_cert( 'devstia', $domains );
                     }
                 }
             }
@@ -669,7 +669,7 @@ if ( ! class_exists( 'DEV_PW') ) {
          * @param key string optional value to be used as key
          * @returns string containing decrypted data
          */
-        public function decrypt( $data, $key = 'personal-web-server' ) {
+        public function decrypt( $data, $key = 'devstia-preview' ) {
             $key = md5( $key );
             $data = explode( ':', $data );
             $encrypted_data = base64_decode( $data[0] );
@@ -685,7 +685,7 @@ if ( ! class_exists( 'DEV_PW') ) {
          * @param key string optional value to be used as key
          * @returns string containing decrypted data
          */
-        public function encrypt( $data, $key = 'personal-web-server' ) {
+        public function encrypt( $data, $key = 'devstia-preview' ) {
             $key = md5( $key );
             $iv = openssl_random_pseudo_bytes(16); // Generate a random IV
         
