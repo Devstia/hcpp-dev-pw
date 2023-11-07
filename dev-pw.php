@@ -612,8 +612,8 @@ if ( ! class_exists( 'DEV_PW') ) {
             $css = '<style>.top-bar-logo img { height:39px; width:64px }';
             if ( strpos( $args['content'], 'dark.min.css' ) !== false ) {
                 $css .= ".main-menu-item-link.active .main-menu-item-label {";
-                $css .= "color:#FF2205}@media (min-width: 768px) {";
-                $css .= ".main-menu-item-link.active {border-bottom-color:#FF2205}}";
+                $css .= "color:var(--icon-color-blue)}@media (min-width: 768px) {";
+                $css .= ".main-menu-item-link.active {border-width: 0px;border-bottom-width:4px;border-style: solid;border-image:linear-gradient(to right,#0077DC,#DB3213)1;}}";
                 $css .= "body > div.login > a > img {width:200px;height:240px;transform:scale(.75);margin:-35px;}";
             }
             $css .= '</style>';
