@@ -613,7 +613,7 @@ if ( ! class_exists( 'DEV_PW') ) {
             if ( strpos( $args['content'], 'dark.min.css' ) !== false ) {
                 $css .= ".main-menu-item-link.active .main-menu-item-label {";
                 $css .= "color:var(--icon-color-blue)}@media (min-width: 768px) {";
-                $css .= ".main-menu-item-link.active {border-width: 0px;border-bottom-width:4px;border-style: solid;border-image:linear-gradient(to right,#0077DC,#DB3213)1;}}";
+                $css .= ".main-menu-item-link.active {border-width: 0px;border-bottom-width:4px;border-style: solid;border-image:linear-gradient(to right,#3D5E9D,#0077D9,#0096F4,#E13413,#FF8800)1;}}";
                 $css .= "body > div.login > a > img {width:200px;height:240px;transform:scale(.75);margin:-35px;}";
             }
             $css .= '</style>';
