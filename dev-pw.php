@@ -654,7 +654,7 @@ if ( ! class_exists( 'DEV_PW') ) {
             $content .= '        var loginMsg = document.createElement("div");';
             $content .= '        var formLogin = document.getElementById("form_login");';
             $content .= '        formLogin.style.display = "none";';
-            $content .= '        loginMsg.innerHTML = "<h1 class=\"login-title\">Welcome to Devstia Preview</h1>Please wait. Automatically logging in...<br><br><br>";';
+            $content .= '        loginMsg.innerHTML = "<h1 class=\"login-title\">Welcome to Devstia Preview</h1>Please wait for automatic login...<br><br><br>";';
             $content .= '        formLogin.parentNode.insertBefore(loginMsg, formLogin.nextSibling);';
             $content .= '    }';
             $content .= '});';
