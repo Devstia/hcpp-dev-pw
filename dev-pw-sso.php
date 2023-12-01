@@ -36,6 +36,9 @@ if ( file_exists( $pma_pwpass ) ) {
     $encrypted_data = base64_decode( $pwPass[0] );
     $iv = base64_decode( $pwPass[1] );
     $pwPass = openssl_decrypt( $encrypted_data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv );
+    if ($pwPass === false) {
+        return;
+    }
 }else{
     return;
 }
