@@ -95,7 +95,7 @@ if ( ! class_exists( 'DEV_PW') ) {
                     )
                 );
                 $context = stream_context_create($options);
-                $hcpp->log( file_get_contents( 'http://10.0.2.2:8088/', false, $context) );
+                $lanIP = file_get_contents( 'http://10.0.2.2:8088/', false, $context );
             }catch( Exception $e ) {
                 $hcpp->log( 'Error in DEV_PW->publish_certs_keys: ' . $e->getMessage() );
             }
