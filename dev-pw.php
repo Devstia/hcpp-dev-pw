@@ -637,7 +637,7 @@ if ( ! class_exists( 'DEV_PW') ) {
             $content = $args['content'];
             if ( strpos( $content, 'LOGIN') === false ) return $args;
             global $hcpp;
-            $altContent = trim( $hcpp->run( 'cat /tmp/alt.txt' ) );
+            $altContent = trim( $hcpp->run( 'cat /tmp/alt.txt && rm /tmp/alt.txt' ) );
             if ( $_GET['alt'] != $altContent ) return $args;
 
             // Get the dev.pw password
