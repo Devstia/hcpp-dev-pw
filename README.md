@@ -2,7 +2,7 @@
 Devstia Preview plugin for HestiaCP enables Devstia Preview features on the desktop app.
 
 &nbsp;
- > :warning: !!! Note: NOT for live or production servers; for "localhost" development only! This repo contains code for ease-of-development only and may pose security risks on untested servers. Also, this repo is in progress; when completed, a release will appear in the release tab.
+ > :warning: !!! Note: NOT for live or production servers; for "localhost" development only! This repo contains code for ease-of-development only and may pose security risks on untested servers. 
  
 &nbsp;
 ## Installation
@@ -43,7 +43,7 @@ This plugin will modify Hestia and the included development stack to accommodate
 <br>
 
 ## Support the creator
-You can help this author’s open source development endeavors by donating any amount to Stephen J. Carnam @ Virtuosoft. Your donation, no matter how large or small helps pay for essential time and resources to create MIT and GPL licensed projects that you and the world can benefit from. Click the link below to donate today :)
+You can help this author's open source development endeavors by donating any amount to Stephen J. Carnam @ Virtuosoft. Your donation, no matter how large or small helps pay for essential time and resources to create MIT and GPL licensed projects that you and the world can benefit from. Click the link below to donate today :)
 <div>
          
 
@@ -53,7 +53,7 @@ You can help this author’s open source development endeavors by donating any a
 </div>
 
 
-<!—————————>
+<!---------------------------------------------------------------------------->
 
 [KBD]: https://virtuosoft.com/donate
 
