@@ -292,7 +292,7 @@ if ( ! class_exists( 'DEV_PW') ) {
                     chgrp( $pma_token_file, 'www-data' );
                 }
 
-                // Get the devstia preview password
+                // Get the devstia personal web password
                 $passwd = trim( shell_exec( 'cat /home/admin/.pwPass' ) );
                 $passwd = $this->decrypt( $passwd );
 
@@ -309,7 +309,7 @@ if ( ! class_exists( 'DEV_PW') ) {
         }
 
         /**
-         * Generate the master certificate for HestiaCP, Devstia Preview. This will overwrite
+         * Generate the master certificate for HestiaCP, Devstia Personal Web. This will overwrite
          * any existing certificate if one already exists; then add it
          * to the system trusted certificates.
          */
@@ -320,7 +320,7 @@ if ( ! class_exists( 'DEV_PW') ) {
             $devcc_folder = '/usr/local/share/ca-certificates/dev.pw';
             $cmd = "rm -rf $devcc_folder && mkdir -p $devcc_folder && cd $devcc_folder && ";
             $cmd .= 'openssl  genrsa -out ./dev.pw.key 2048 2>&1 && ';
-            $cmd .= 'openssl req -x509 -new -nodes -key ./dev.pw.key -sha256 -days 825 -out ./dev.pw.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=Devstia Preview/CN=dev.pw" 2>&1 && ';
+            $cmd .= 'openssl req -x509 -new -nodes -key ./dev.pw.key -sha256 -days 825 -out ./dev.pw.crt -subj "/C=US/ST=California/L=San Diego/O=Virtuosoft/OU=Devstia Personal Web/CN=dev.pw" 2>&1 && ';
             $cmd .= 'update-ca-certificates 2>&1';
             $cmd = $hcpp->do_action( 'dev_pw_generate_master_cert', $cmd );
             $hcpp->log( shell_exec( $cmd ) );
@@ -382,7 +382,7 @@ if ( ! class_exists( 'DEV_PW') ) {
             $template .= "stateOrProvinceName = California\n";
             $template .= "localityName = San Diego\n";
             $template .= "organizationName = Virtuosoft\n";
-            $template .= "organizationalUnitName = Devstia Preview\n";
+            $template .= "organizationalUnitName = Devstia Personal Web\n";
             $template .= "commonName = $domains[0]\n";
             $template .= "\n";
             $template = $hcpp->do_action( 'dev_pw_generate_website_cert_template', $template );
@@ -565,7 +565,7 @@ if ( ! class_exists( 'DEV_PW') ) {
             // HestiaCP failed to white label.
             if ( $args['page'] == 'list_services' ) {
                 $content = $args['content'];
-                $content = str_replace( 'Hestia Control Panel', 'Devstia Preview', $content );
+                $content = str_replace( 'Hestia Control Panel', 'Devstia Personal Web', $content );
                 $args['content'] = $content;
             }
 
@@ -654,7 +654,7 @@ if ( ! class_exists( 'DEV_PW') ) {
             $content .= '        var loginMsg = document.createElement("div");';
             $content .= '        var formLogin = document.getElementById("form_login");';
             $content .= '        formLogin.style.display = "none";';
-            $content .= '        loginMsg.innerHTML = "<h1 class=\"login-title\">Welcome to Devstia Preview</h1>Please wait for automatic login...<br><br><br>";';
+            $content .= '        loginMsg.innerHTML = "<h1 class=\"login-title\">Welcome to Devstia PW</h1>Please wait for automatic login...<br><br><br>";';
             $content .= '        formLogin.parentNode.insertBefore(loginMsg, formLogin.nextSibling);';
             $content .= '    }';
             $content .= '});';
@@ -670,7 +670,7 @@ if ( ! class_exists( 'DEV_PW') ) {
          * @param key string optional value to be used as key
          * @returns string containing decrypted data
          */
-        public function decrypt( $data, $key = 'devstia-preview' ) {
+        public function decrypt( $data, $key = 'devstia-personal-web' ) {
             $key = md5( $key );
             $data = explode( ':', $data );
             $encrypted_data = base64_decode( $data[0] );
@@ -686,7 +686,7 @@ if ( ! class_exists( 'DEV_PW') ) {
          * @param key string optional value to be used as key
          * @returns string containing decrypted data
          */
-        public function encrypt( $data, $key = 'devstia-preview' ) {
+        public function encrypt( $data, $key = 'devstia-personal-web' ) {
             $key = md5( $key );
             $iv = openssl_random_pseudo_bytes(16); // Generate a random IV
         

@@ -1,5 +1,5 @@
 # hcpp-dev-pw
-Devstia Preview plugin for HestiaCP enables Devstia Preview features on the desktop app.
+Devstia Personal Web plugin for HestiaCP enables Devstia Personal Web features on the desktop app.
 
 &nbsp;
  > :warning: !!! Note: NOT for live or production servers; for "localhost" development only! This repo contains code for ease-of-development only and may pose security risks on untested servers. 
@@ -38,7 +38,7 @@ touch "/usr/local/hestia/data/hcpp/installed/dev-pw"
 This plugin will modify Hestia and the included development stack to accommodate local development. This includes, but is not limited to:
 
 * Creating a root self-signed certificate for automated SSL website development. 
-* Furnishing cutting edge bug fixes and functionality geared towards local development with the Devstia Preview application. 
+* Furnishing cutting edge bug fixes and functionality geared towards local development with the Devstia Personal Web application. 
    
 <br>
 
