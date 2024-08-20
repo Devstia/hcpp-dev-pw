@@ -561,6 +561,29 @@ if ( ! class_exists( 'DEV_PW') ) {
                 $args['content'] = $content;
             }
 
+            // Intercept add web save on enter key pressed in safari
+            // Prevent "domain already exists" error message when using enter key
+            if ( $args['page'] == 'add_web' ) {
+                $code = '<script>
+                $(document).ready(function() {
+                    // Function to detect if the browser is Safari
+                    function isSafari() {
+                        return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                    }
+
+                    // Attach keydown event listener to the v_domain input
+                    $("#v_domain").on("keydown", function(event) {
+                        // Check if the pressed key is "Enter" and if the browser is Safari
+                        if (event.key === "Enter" && isSafari()) {
+                            event.preventDefault(); // Prevent the default action
+                        }
+                    });
+                });';
+                $content = $args['content'];
+                $content = str_replace( '</form>', '</form>' . $code, $content );
+                $args['content'] = $content;
+            }
+
             // White label anything leftover that says Hestia Control Panel that
             // HestiaCP failed to white label.
             if ( $args['page'] == 'list_services' ) {
