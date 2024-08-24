@@ -2,3 +2,4 @@
 rm -f /home/admin/web/local.dev.pw/public_html/index.html
 cp -r /usr/local/hestia/plugins/dev-pw/public_html/* /home/admin/web/local.dev.pw/public_html/
 chown -f -R admin:admin /home/admin/web/local.dev.pw/public_html
+chown root:www-data /etc/phpmyadmin/config.inc.php
