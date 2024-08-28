@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: DEV-PW
- * Plugin URI: https://github.com/virtuosoft-dev/hcpp-dev-pw
+ * Plugin URI: https://github.com/Devstia/hcpp-dev-pw
  * Description: Devstia Personal Web plugin for HestiaCP enables Devstia Personal Web features on the desktop app.
  * Version: 1.0.0
  * Author: Stephen J. Carnam
